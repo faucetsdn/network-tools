@@ -1,2 +1,1 @@
 pika
-requests
