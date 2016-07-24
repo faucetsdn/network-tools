@@ -3,3 +3,4 @@ name = Feature generation from PCAPs
 
 [service]
 schedule = {"all":"hourly"}
+mime_types = application/vnd.tcpdump.pcap
