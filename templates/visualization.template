@@ -1,0 +1,11 @@
+[info]
+name = Visualization
+
+[service]
+schedule = {"all":"continuous"}
+
+[grafana]
+HostConfig = {"LogConfig":{"Type": "syslog", "Config": {"syslog-address":"tcp://localhost"}}, "Links": ["core-elasticsearch:elasticsearch"], "PublishAllPorts": true}
+
+[kibana]
+HostConfig = {"LogConfig":{"Type": "syslog", "Config": {"syslog-address":"tcp://localhost"}}, "Links": ["core-elasticsearch:elasticsearch"], "PublishAllPorts": true}
