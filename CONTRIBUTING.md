@@ -21,7 +21,7 @@ received feedback on what to improve.
 We're trying very hard to keep Vent lean and focused. We don't want it
 to do everything for everybody. This means that we might decide against
 incorporating a new feature. However, there might be a way to implement
-that feature *on top of* Vent. Plugins!
+that feature *on top of* Vent Plugins!
 
 ### Create issues...
 
@@ -98,30 +98,5 @@ It is every maintainer's responsibility to:
 ### How is this process changed?
 
 Just like everything else: by making a pull request :)
-
-## Developer Tips & Tricks
-
-After you've installed and setup `vent`, familiarized yourself with the contents, and are ready to make changes these might be helpful to bear in mind.
-
-### Rebuilding `vent`
-To rebuild a docker-machine provisioned instance of `vent`:
-```
-$ make clean
-$ make
-$ docker-machine rm -y vent
-$ docker-machine create -d virtualbox --virtualbox-boot2docker-url http://localhost:8000/vent.iso vent
-```
-
-But rebuilding Vent can be time-consuming and costly, so for most small changes `Update Vent` is the better choice.
-
-### Updating `vent`
-
-To update a docker-machine provisioned instance of `vent`:
-
-```
-$ docker-machine scp .../file vent:/tmp
-$ docker-machine ssh vent "sudo mv /tmp/file /..."
-$ docker-machine ssh vent
-```
 
 *Derivative work from [Docker](https://github.com/docker/docker/blob/master/CONTRIBUTING.md).*
