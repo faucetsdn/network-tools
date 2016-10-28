@@ -1,0 +1,6 @@
+[info]
+name = Feature generation from CSVs
+
+[service]
+schedule = {"all":"hourly"}
+ext_types = csv
