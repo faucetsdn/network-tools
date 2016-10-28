@@ -30,7 +30,7 @@ def get_path():
     try:
         path = sys.argv[1]
     except:
-        print "no path provided, quitting."
+        print("no path provided, quitting.")
     return path
 
 def connections():
@@ -45,19 +45,19 @@ def connections():
         channel.exchange_declare(exchange='topic_recs',
                                  type='topic')
     except:
-        print "unable to connect to rabbitmq, quitting."
+        print("unable to connect to rabbitmq, quitting.")
     return channel, connection
 
 
 def run_tool(path):
     """Tool entry point"""
     routing_key = "dshell_netflow_parser"+path.replace("/", ".")
-    print "processing pcap results..."
+    print("processing pcap results...")
     subprocess.Popen('/Dshell/dshell-decode -o /tmp/results.out -d netflow '+path,
                      shell=True, stdout=subprocess.PIPE).wait()
 
     channel, connection = connections()
-    print "sending pcap results..."
+    print("sending pcap results...")
 
     try:
         with open('/tmp/results.out', 'r') as f:
@@ -85,7 +85,7 @@ def run_tool(path):
 
                     if channel:
                         channel.basic_publish(exchange='topic_recs', routing_key=routing_key,body=message)
-                        print " [x] Sent %r:%r" % (routing_key, message)
+                        print(" [x] Sent %r:%r" % (routing_key, message))
                 except:
                     pass
     except:
