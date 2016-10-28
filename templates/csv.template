@@ -3,5 +3,4 @@ name = Feature generation from CSVs
 
 [service]
 schedule = {"all":"hourly"}
-mime_types = text/csv
 ext_types = csv
