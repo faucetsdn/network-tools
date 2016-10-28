@@ -15,29 +15,30 @@
 #   limitations under the License.
 
 """
-Test module for dshell_netflow_parser.py
+Test module for csv_row_broadcast.py
 
-Created on 13 June 2016
-@author: Charlie Lewis, Abhi Ganesh
+Created on 28 October 2016
+@author: Peter Bronez
 """
 
 import pytest
 import sys
 
-from dshell_netflow_parser import get_path
-from dshell_netflow_parser import run_tool
+from csv_row_broadcast import get_path
+from csv_row_broadcast import run_tool
+
 
 def test_get_path():
     get_path()
     sys.argv = []
     get_path()
 
+
 def test_run_tool():
     with open('/tmp/test', 'w') as f:
-        f.write("this is a test file")
+        f.write("Column 1,col2,col_3\n")
+        f.write("Row 1,foo,bar\n")
+        f.write("row 2,baz,42\n")
     run_tool('/tmp/test')
 
-    with open('/tmp/results.out', 'w') as f:
-        f.write("2015-05-20 19:41:59.300879      0.0.0.0 ->    0.0.0.0  (US -> US)  TCP    1940   49152     0      0        0        0  0.0000s")
-    run_tool('/tmp/results.out')
-
+    # TODO: spin up local RabbitMQ instance and monitor correctness

@@ -15,23 +15,29 @@
 #   limitations under the License.
 
 """
-DShell netflow parser plugin
+CSV Row Parser Plugin
 
-Created on 13 June 2016
-@author: Charlie Lewis, Abhi Ganesh
+Breaks a CSV file down into a series of messages, one for each row.
+
+Created on 28 October 2016
+@author: Peter Bronez
 """
 
 import pika
-import subprocess
+import csv
 import sys
+import json
+
 
 def get_path():
+    """Get the path to the input file provided by Vent"""
     path = None
     try:
         path = sys.argv[1]
     except:
-        print "no path provided, quitting."
+        print("no path provided, quitting.")
     return path
+
 
 def connections():
     """Handle connection setup to rabbitmq service"""
@@ -42,59 +48,30 @@ def connections():
             host='rabbitmq'))
         channel = connection.channel()
 
-        channel.exchange_declare(exchange='topic_recs',
-                                 type='topic')
+        channel.exchange_declare(exchange='topic_recs', type='topic')
     except:
-        print "unable to connect to rabbitmq, quitting."
+        print("unable to connect to rabbitmq, quitting.")
     return channel, connection
 
 
 def run_tool(path):
     """Tool entry point"""
-    routing_key = "dshell_netflow_parser"+path.replace("/", ".")
-    print "processing pcap results..."
-    subprocess.Popen('/Dshell/dshell-decode -o /tmp/results.out -d netflow '+path,
-                     shell=True, stdout=subprocess.PIPE).wait()
 
-    channel, connection = connections()
-    print "sending pcap results..."
+    routing_key = "csv_row_broadcast" + path.replace("/", ".")
 
-    try:
-        with open('/tmp/results.out', 'r') as f:
-            for rec in f:
-                data = {}
-                rec = rec.strip()
-                fields = rec.split()
-                try:
-                    data["date"] = fields[0].strip()
-                    data["time"] = fields[1].strip()
-                    data["src_ip"] = fields[2].strip()
-                    data["dst_ip"] = fields[4].strip()
-                    data["src_country_code"] = fields[5].strip()[1:]
-                    data["dst_country_code"] = fields[7].strip()[:-1]
-                    data["protocol"] = fields[8].strip()
-                    data["src_port"] = fields[9].strip()
-                    data["dst_port"] = fields[10].strip()
-                    data["src_packets"] = fields[11].strip()
-                    data["dst_packets"] = fields[12].strip()
-                    data["src_bytes"] = fields[13].strip()
-                    data["dst_bytes"] = fields[14].strip()
-                    data["duration"] = fields[15].strip()
-                    data["tool"] = "dshell_netflow"
-                    message = str(data)
+    with open(path) as csvfile:
+        print("Parsing CSV file...")
 
-                    if channel:
-                        channel.basic_publish(exchange='topic_recs', routing_key=routing_key,body=message)
-                        print " [x] Sent %r:%r" % (routing_key, message)
-                except:
-                    pass
-    except:
-        pass
+        # This pure Python implimentation could be replaced with a more robust parser
+        reader = csv.DictReader(csvfile)  # Assumes headers in the first row
 
-    try:
-        connection.close()
-    except:
-        pass
+        channel, connection = connections()
+
+        print("sending csv results...")
+        for row in reader:
+            message = json.dumps(row)
+            channel.basic_publish(exchange='topic_recs', routing_key=routing_key, body=message)
+            print(" [x] Sent {1}:{2}".format(routing_key, message))
 
 if __name__ == '__main__':
     path = get_path()
