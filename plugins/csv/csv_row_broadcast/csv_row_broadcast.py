@@ -71,7 +71,7 @@ def run_tool(path):
         for row in reader:
             message = json.dumps(row)
             channel.basic_publish(exchange='topic_recs', routing_key=routing_key, body=message)
-            print(" [x] Sent {1}:{2}".format(routing_key, message))
+            print(" [x] Sent {0}:{1}".format(routing_key, message))
 
 if __name__ == '__main__':
     path = get_path()
