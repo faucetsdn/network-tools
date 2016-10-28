@@ -38,7 +38,9 @@ help prioritize the most common problems and requests.
 
 ### Conventions
 
-Fork the repo and make changes on your fork in a feature branch.
+Fork the repo and make changes on your fork in the master branch. (Vent loads
+plugins from the Master branch exclusively, so it won't pickup changes made in
+a feature branch!)
 
 Make sure you include relevant updates or additions to documentation and
 tests when creating or modifying features.
