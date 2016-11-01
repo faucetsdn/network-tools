@@ -1,5 +1,5 @@
 # vent-plugins
-This project is a place for plug-ins thatrun on the [Vent](https://github.com/CyberReboot/vent) virutal appliance.
+This project is a place for plug-ins that run on the [Vent](https://github.com/CyberReboot/vent) virutal appliance.
 
 Vent is a self-contained virtual appliance based on [boot2docker](http://boot2docker.io/) that provides a platform to collect and analyze data across a flexible set of tools and technologies. With Vent you can quickly deploy any combination of tools configured in whatever manner makes sense for the environment it is being deployed to and have it all be version controlled by default. See blog post at [Introducing Vent](https://blog.cyberreboot.org/introducing-vent-1d883727b624#.61kl2jgm1)
 
