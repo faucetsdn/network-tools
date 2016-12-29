@@ -31,7 +31,7 @@ def get_path():
     try:
         path = sys.argv[1]
     except:
-        print "no path provided, quitting."
+        print("no path provided, quitting.")
     return path
 
 
@@ -47,7 +47,7 @@ def connections():
         channel.exchange_declare(exchange='topic_recs',
                                  type='topic')
     except:
-        print "unable to connect to rabbitmq, quitting."
+        print("unable to connect to rabbitmq, quitting.")
     return channel, connection
 
 
@@ -147,7 +147,7 @@ def return_packet(line_source):
 def run_tool(path):
     """Tool entry point"""
     routing_key = "tcpdump_hex_parser"+path.replace("/", ".")
-    print "processing pcap results..."
+    print("processing pcap results...")
     channel, connection = connections()
     proc = subprocess.Popen('tcpdump -nn -tttt -xx -r '+path, shell=True, stdout=subprocess.PIPE)
     for packet in return_packet(proc.stdout):
@@ -156,7 +156,7 @@ def run_tool(path):
             channel.basic_publish(exchange='topic_recs',
                                   routing_key=routing_key,
                                   body=message)
-        print " [x] Sent %r:%r" % (routing_key, message)
+        print(" [x] Sent %r:%r" % (routing_key, message))
     try:
         connection.close()
     except:
