@@ -1,11 +1,9 @@
 [info]
-name = Visualization
+name = Kibana
+groups = visualization
 
-[service]
-schedule = {"all":"continuous"}
+[settings]
+priority = 1
 
-[grafana]
-HostConfig = {"LogConfig":{"Type": "syslog", "Config": {"syslog-address":"tcp://localhost"}}, "Links": ["core-elasticsearch:elasticsearch"], "PublishAllPorts": true}
-
-[kibana]
-HostConfig = {"LogConfig":{"Type": "syslog", "Config": {"syslog-address":"tcp://localhost"}}, "Links": ["core-elasticsearch:elasticsearch"], "PublishAllPorts": true}
+[docker]
+HostConfig = {"LogConfig":{"Type": "syslog", "Config": {"syslog-address":"tcp://localhost"}}, "Links": ["Elasticsearch:elasticsearch"], "PublishAllPorts": true}

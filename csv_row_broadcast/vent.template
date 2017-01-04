@@ -1,6 +1,6 @@
 [info]
 name = Feature generation from CSVs
+groups = csv
 
-[service]
-schedule = {"all":"hourly"}
+[settings]
 ext_types = csv
