@@ -6,4 +6,5 @@ groups = visualization
 priority = 1
 
 [docker]
-HostConfig = {"LogConfig":{"Type": "syslog", "Config": {"syslog-address":"tcp://localhost"}}, "Links": ["Elasticsearch:elasticsearch"], "PublishAllPorts": true}
+links = {"Elasticsearch":"elasticsearch"}
+publish_all_ports = True
