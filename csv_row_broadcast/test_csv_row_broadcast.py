@@ -40,5 +40,3 @@ def test_run_tool():
         f.write("Row 1,foo,bar\n")
         f.write("row 2,baz,42\n")
     run_tool('/tmp/test')
-
-    # TODO: spin up local RabbitMQ instance and monitor correctness

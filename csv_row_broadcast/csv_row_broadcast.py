@@ -23,11 +23,9 @@ Created on 28 October 2016
 @author: Peter Bronez
 """
 
-import pika
 import csv
 import sys
 import json
-
 
 def get_path():
     """Get the path to the input file provided by Vent"""
@@ -37,22 +35,6 @@ def get_path():
     except:
         print("no path provided, quitting.")
     return path
-
-
-def connections():
-    """Handle connection setup to rabbitmq service"""
-    channel = None
-    connection = None
-    try:
-        connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host='rabbitmq'))
-        channel = connection.channel()
-
-        channel.exchange_declare(exchange='topic_recs', type='topic')
-    except:
-        print("unable to connect to rabbitmq, quitting.")
-    return channel, connection
-
 
 def run_tool(path):
     """Tool entry point"""
@@ -70,8 +52,7 @@ def run_tool(path):
         print("Sending CSV results: {0}".format(path))
         for row in reader:
             message = json.dumps(row)
-            channel.basic_publish(exchange='topic_recs', routing_key=routing_key, body=message)
-            print(" [x] Sent {0}:{1}".format(routing_key, message))
+            print("{0}".format(message))
 
 if __name__ == '__main__':
     path = get_path()
