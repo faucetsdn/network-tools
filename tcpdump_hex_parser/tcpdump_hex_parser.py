@@ -21,7 +21,6 @@ Created on 13 June 2016
 @author: Charlie Lewis, David Grossman
 """
 
-import pika
 import subprocess
 import sys
 
@@ -33,22 +32,6 @@ def get_path():
     except:
         print("no path provided, quitting.")
     return path
-
-
-def connections():
-    """Handle connection setup to rabbitmq service"""
-    channel = None
-    connection = None
-    try:
-        connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host='rabbitmq'))
-        channel = connection.channel()
-
-        channel.exchange_declare(exchange='topic_recs',
-                                 type='topic')
-    except:
-        print("unable to connect to rabbitmq, quitting.")
-    return channel, connection
 
 
 def parse_header(line):
@@ -146,21 +129,9 @@ def return_packet(line_source):
 
 def run_tool(path):
     """Tool entry point"""
-    routing_key = "tcpdump_hex_parser"+path.replace("/", ".")
-    print("processing pcap results...")
-    channel, connection = connections()
     proc = subprocess.Popen('tcpdump -nn -tttt -xx -r '+path, shell=True, stdout=subprocess.PIPE)
     for packet in return_packet(proc.stdout):
-        message = str(packet)
-        if channel is not None:
-            channel.basic_publish(exchange='topic_recs',
-                                  routing_key=routing_key,
-                                  body=message)
-        print(" [x] Sent %r:%r" % (routing_key, message))
-    try:
-        connection.close()
-    except:
-        pass
+        print(str(packet))
 
 if __name__ == '__main__':
     path = get_path()
