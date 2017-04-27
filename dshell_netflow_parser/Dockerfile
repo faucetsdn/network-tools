@@ -26,7 +26,6 @@ RUN make
 
 ADD . /dshell_netflow
 WORKDIR /dshell_netflow
-RUN pip install -r requirements.txt
 
 ENTRYPOINT ["python", "dshell_netflow_parser.py"]
 CMD [""]

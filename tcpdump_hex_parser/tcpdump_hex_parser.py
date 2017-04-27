@@ -24,7 +24,6 @@ Created on 13 June 2016
 import subprocess
 import sys
 
-
 def get_path():
     path = None
     try:
@@ -32,7 +31,6 @@ def get_path():
     except:
         print("no path provided, quitting.")
     return path
-
 
 def parse_header(line):
     """Parse output of tcpdump of pcap file, extract:
@@ -125,7 +123,6 @@ def return_packet(line_source):
             #concatenate the data
             data = parse_data(line_strip, ret_header['length'])
             ret_data = ret_data + data
-
 
 def run_tool(path):
     """Tool entry point"""
