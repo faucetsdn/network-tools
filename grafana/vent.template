@@ -1,0 +1,10 @@
+[info]
+name = Grafana
+groups = visualization
+
+[settings]
+priority = 2
+
+[docker]
+links = {"Elasticsearch":"elasticsearch"}
+publish_all_ports = True

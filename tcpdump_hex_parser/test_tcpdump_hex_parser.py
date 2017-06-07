@@ -58,7 +58,7 @@ def test_parse_header():
     assert ret_dict['dest_ip'] == "0.0.0.0"
     assert ret_dict['src_port'] == "80"
     assert ret_dict['dest_port'] == "80"
-    
+
     ret_dict = parse_header("2015-05-20 12:41:45.812393 IP 0.0.0.0.80 > 0.0.0.0.80: ESP(spi=0xb1ced15c,seq=0x30)")
     assert ret_dict['src_ip'] == "0.0.0.0"
     assert ret_dict['dest_ip'] == "0.0.0.0"

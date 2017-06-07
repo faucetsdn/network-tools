@@ -1,0 +1,10 @@
+[info]
+name = Kibana
+groups = visualization
+
+[settings]
+priority = 1
+
+[docker]
+links = {"Elasticsearch":"elasticsearch"}
+publish_all_ports = True

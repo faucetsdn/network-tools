@@ -21,7 +21,6 @@ Created on 13 June 2016
 @author: Charlie Lewis, Abhi Ganesh
 """
 
-import pika
 import subprocess
 import sys
 
@@ -33,32 +32,10 @@ def get_path():
         print("no path provided, quitting.")
     return path
 
-def connections():
-    """Handle connection setup to rabbitmq service"""
-    channel = None
-    connection = None
-    try:
-        connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host='rabbitmq'))
-        channel = connection.channel()
-
-        channel.exchange_declare(exchange='topic_recs',
-                                 type='topic')
-    except:
-        print("unable to connect to rabbitmq, quitting.")
-    return channel, connection
-
-
 def run_tool(path):
     """Tool entry point"""
-    routing_key = "dshell_netflow_parser"+path.replace("/", ".")
-    print("processing pcap results...")
     subprocess.Popen('/Dshell/dshell-decode -o /tmp/results.out -d netflow '+path,
                      shell=True, stdout=subprocess.PIPE).wait()
-
-    channel, connection = connections()
-    print("sending pcap results...")
-
     try:
         with open('/tmp/results.out', 'r') as f:
             for rec in f:
@@ -81,18 +58,9 @@ def run_tool(path):
                     data["dst_bytes"] = fields[14].strip()
                     data["duration"] = fields[15].strip()
                     data["tool"] = "dshell_netflow"
-                    message = str(data)
-
-                    if channel:
-                        channel.basic_publish(exchange='topic_recs', routing_key=routing_key,body=message)
-                        print(" [x] Sent %r:%r" % (routing_key, message))
+                    print( str(data))
                 except:
                     pass
-    except:
-        pass
-
-    try:
-        connection.close()
     except:
         pass
 
