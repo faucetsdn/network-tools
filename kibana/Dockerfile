@@ -1,1 +1,1 @@
-FROM blacktop/kibana:latest
+FROM kibana:4
