@@ -1,7 +1,8 @@
 FROM ubuntu:16.04
 MAINTAINER Charlie Lewis <clewis@iqt.org>
 
-RUN apt-get update && apt-get install -y git \
+RUN apt-get update && apt-get install --no-install-recommends -y git \
+    make \
     python-crypto \
     python-dpkt \
     python-ipy \
@@ -24,7 +25,7 @@ RUN gunzip *.gz
 WORKDIR /Dshell
 RUN make
 
-ADD . /dshell_netflow
+COPY . /dshell_netflow
 WORKDIR /dshell_netflow
 
 ENTRYPOINT ["python", "dshell_netflow_parser.py"]
