@@ -39,15 +39,11 @@ def get_path():
 def run_tool(path):
     """Tool entry point"""
 
-    routing_key = "csv_row_broadcast" + path.replace("/", ".")
-
     with open(path) as csvfile:
         print("Parsing CSV file: {0}".format(path))
 
         # This pure Python implimentation could be replaced with a more robust parser
         reader = csv.DictReader(csvfile)  # Assumes headers in the first row
-
-        channel, connection = connections()
 
         print("Sending CSV results: {0}".format(path))
         for row in reader:
