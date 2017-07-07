@@ -2,7 +2,7 @@
 name = Grafana
 groups = visualization
 
-[serivce]
+[service]
 uri_prefix = http://
 
 [settings]
