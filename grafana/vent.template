@@ -2,6 +2,9 @@
 name = Grafana
 groups = visualization
 
+[serivce]
+uri_prefix = http://
+
 [settings]
 priority = 2
 
