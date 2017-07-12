@@ -1,0 +1,11 @@
+[info]
+name = Simple GPU Example
+groups = gpu
+
+[gpu]
+enabled = yes
+mem_percentage = 0.2
+device = 0
+
+[settings]
+ext_types = matrix
