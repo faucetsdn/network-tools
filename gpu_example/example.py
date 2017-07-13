@@ -1,4 +1,3 @@
-import json
 import sys
 import numpy as np
 import tensorflow as tf
@@ -22,4 +21,4 @@ with graph.as_default():
         output = sess.run(y, {X: data})
 
 # print out results
-print(json.dumps(output.flatten().tolist()))
+print(str(output.flatten()))
