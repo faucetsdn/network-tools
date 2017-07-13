@@ -13,7 +13,7 @@ with graph.as_default():
     with tf.device('/gpu:0'):
         X = tf.placeholder("float64",[2,2])
         npmatrix = np.array([[10.0, 2.0], [-5.0, 8.78]])
-        matrix = tf.Variable(npmatrix))
+        matrix = tf.Variable(npmatrix)
         y = tf.matmul(X, matrix)
 
     # Run the computations on the input
