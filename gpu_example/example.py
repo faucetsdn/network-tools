@@ -1,6 +1,10 @@
+import os
 import sys
 import numpy as np
 import tensorflow as tf
+
+# suppress output from tensorflow
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # Read in data from file
 data = np.genfromtxt(sys.argv[1], delimiter=',')
