@@ -22,4 +22,4 @@ with graph.as_default():
         output = sess.run(y, {X: data})
 
 # print out results
-print(json.dumps(output.flatten()))
+print(json.dumps(output.flatten().tolist()))
