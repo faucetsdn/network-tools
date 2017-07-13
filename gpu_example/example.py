@@ -10,7 +10,7 @@ data = np.reshape(data,(2,2))
 # Generate graph of gpu computations
 graph = tf.Graph()
 with graph.as_default():
-    with tf.device('/cpu:0'):
+    with tf.device('/gpu:0'):
         X = tf.placeholder("float64",[2,2])
         npmatrix = np.array([[10.0, 2.0], [-5.0, 8.78]])
         matrix = tf.Variable(npmatrix))
