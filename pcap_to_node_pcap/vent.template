@@ -1,0 +1,6 @@
+[info]
+name = pcap node splitter
+groups = pcap
+
+[settings]
+ext_types = pcap
