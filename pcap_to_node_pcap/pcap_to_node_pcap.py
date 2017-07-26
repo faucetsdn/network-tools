@@ -2,10 +2,11 @@
 Plugin that takes pcap files and splits them by server and client
 ip addresses
 
-Create on 17 July 2017
+Created on 17 July 2017
 @author: Blake Pagon
 """
 
+import datetime
 import os
 import shlex
 import subprocess
@@ -22,17 +23,26 @@ def get_path():
 def run_tool(path):
     # need to make directories to store results from pcapsplitter
     base_dir = path.rsplit('/', 1)[0]
+    timestamp = ""
     try:
-        os.mkdir(base_dir + '/clients')
-        os.mkdir(base_dir + '/servers')
+        timestamp = '-'.join(str(datetime.datetime.now()).split(' ')) + '-UTC'
+        timestamp = timestamp.replace(':', '_')
+    except Exception as e:
+        print("couldn't create output directory with unique timestamp")
+    # make directory for tool name recognition of piping to other tools
+    output_dir = os.path.join(base_dir, 'pcap-node-splitter' + '-' + timestamp)
+    try:
+        os.mkdir(output_dir)
+        os.mkdir(output_dir + '/clients')
+        os.mkdir(output_dir + '/servers')
     except OSError:
-        print("clients and servers directories already exist")
+        print("couldn't make directories for output of this tool")
     try:
         subprocess.check_call(shlex.split("./PcapPlusPlus/Examples/PcapSplitter/Bin/PcapSplitter -f " + 
-                                          path + " -o " + base_dir + '/clients' + " -m client-ip"))
+                                          path + " -o " + output_dir + '/clients' + " -m client-ip"))
 
         subprocess.check_call(shlex.split("./PcapPlusPlus/Examples/PcapSplitter/Bin/PcapSplitter -f " + 
-                                          path + " -o " + base_dir + '/servers' + " -m server-ip"))
+                                          path + " -o " + output_dir + '/servers' + " -m server-ip"))
     except Exception as e:
         print(str(e))
 
