@@ -4,7 +4,8 @@ groups = gpu
 
 [gpu]
 enabled = yes
-mem_percentage = 0.2
+mem_mb = 1024
+dedicated = yes
 device = 0
 
 [settings]
