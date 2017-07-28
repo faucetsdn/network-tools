@@ -4,3 +4,4 @@ groups = csv
 
 [settings]
 ext_types = csv
+process_base = yes
