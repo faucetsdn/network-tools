@@ -5,3 +5,6 @@ groups = pcap
 [settings]
 ext_type = dump
 process_base = yes
+
+[docker]
+networ_mode = "host"
