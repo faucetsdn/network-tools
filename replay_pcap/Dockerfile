@@ -1,13 +1,8 @@
-FROM ubuntu:16.04
+FROM alpine:3.4
+MAINTAINER Jeff Wang <jwang@iqt.org>
 
-RUN     apt-get -y update && \
-        apt-get -y upgrade
+RUN apk add --update \
+    bash \
+    tcpreplay
 
-RUN     apt-get -y --force-yes install \
-        tcpreplay
-
-RUN     apt-get clean
-
-WORKDIR /replaypcap
-
-CMD [""]
+CMD "./replay.sh"
