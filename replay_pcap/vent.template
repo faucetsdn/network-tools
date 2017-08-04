@@ -1,0 +1,7 @@
+[info]
+name = replay pcaps
+groups = pcap
+
+[settings]
+ext_type = dump
+process_base = yes
