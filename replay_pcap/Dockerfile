@@ -9,11 +9,10 @@ RUN     apt-get -y update && \
         apt-get -y upgrade
 
 RUN     apt-get -y --force-yes install \
-        wget curl tcpreplay
+        tcpreplay
 
 RUN     apt-get clean && \
         rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ADD     replay.sh .
-
-CMD ["./replay.sh"]
+ENTRYPOINT ["/replay.sh"]
+CMD [""]
