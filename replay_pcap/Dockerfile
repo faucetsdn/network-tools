@@ -16,4 +16,4 @@ RUN     apt-get clean && \
 
 ADD     replay.sh .
 
-CMD ["replay.sh $nic $file_path"]
+CMD ["./replay.sh"]
