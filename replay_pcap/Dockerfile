@@ -9,7 +9,6 @@ RUN     apt-get -y update && \
         apt-get -y upgrade
 
 RUN     apt-get -y --force-yes install \
-        tcpdump \ 
         tcpreplay \
         sudo
 
