@@ -20,4 +20,4 @@ RUN     apt-get -y --force-yes install \
 RUN     apt-get clean && \
         rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-#CMD "./replay.sh"
+CMD "./replay.sh $nic $file_path"

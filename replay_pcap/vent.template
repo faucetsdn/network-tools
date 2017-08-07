@@ -1,6 +1,6 @@
 [info]
 name = replay pcaps
-groups = pcap
+groups = pcap,replay
 
 [settings]
 ext_type = dump
