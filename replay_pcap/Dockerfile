@@ -9,7 +9,8 @@ RUN     apt-get -y update && \
         apt-get -y upgrade
 
 RUN     apt-get -y --force-yes install \
-        tcpreplay
+        tcpreplay \
+        sudo
 
 RUN     apt-get clean && \
         rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
