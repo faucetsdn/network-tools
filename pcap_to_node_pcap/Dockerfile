@@ -13,9 +13,13 @@ RUN apt-get update && apt-get install --no-install-recommends -y git \
     gcc \
     g++
 
-RUN git clone https://github.com/bpagon13/PcapPlusPlus.git /PcapPlusPlus
+RUN git clone https://github.com/seladb/PcapPlusPlus.git /PcapPlusPlus
 
 WORKDIR /PcapPlusPlus
+
+RUN rm Examples/PcapSplitter/main.cpp
+
+COPY main.cpp Examples/PcapSplitter
 
 RUN ["/bin/bash", "./configure-linux.sh", "--default"]
 
