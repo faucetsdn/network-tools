@@ -1,0 +1,10 @@
+[info]
+name = replay pcaps
+groups = replay
+
+[settings]
+ext_types = dump
+process_base = yes
+
+[docker]
+network_mode = host
