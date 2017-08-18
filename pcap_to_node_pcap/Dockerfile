@@ -17,10 +17,6 @@ RUN git clone https://github.com/seladb/PcapPlusPlus.git /PcapPlusPlus
 
 WORKDIR /PcapPlusPlus
 
-RUN rm Examples/PcapSplitter/main.cpp
-
-COPY main.cpp Examples/PcapSplitter
-
 RUN ["/bin/bash", "./configure-linux.sh", "--default"]
 
 RUN make all
