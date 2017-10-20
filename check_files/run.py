@@ -36,7 +36,7 @@ def main():
     matches = []
     ret_val = dict()
 
-    starting_point = sys.argv[0]
+    starting_point = sys.argv[1]
 
     #directory
     if os.path.isdir(starting_point):
