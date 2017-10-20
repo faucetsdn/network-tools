@@ -1,5 +1,5 @@
 FROM ubuntu:14.04
-MAINTAINER MarvAmBass
+MAINTAINER dgrossman@iqt.org
 
 RUN apt-get update; apt-get install -y \
     python3 \
