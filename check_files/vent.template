@@ -1,0 +1,6 @@
+[info]
+name = check_files
+groups = cpu
+
+[settings]
+ext_types = *
