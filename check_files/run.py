@@ -1,6 +1,7 @@
 #!/bin/env python
 import fnmatch
 import os
+import sys
 import subprocess
 import hashlib
 
@@ -34,9 +35,16 @@ def av_results(p):
 def main():
     matches = []
     ret_val = dict()
-    for root, dirnames, filenames in os.walk('/data'):
-       for filename in fnmatch.filter(filenames, '*'):
-            matches.append(os.path.join(root, filename))
+
+    #directory
+    if os.path.isdir(sys.argv[1]):
+        for root, dirnames, filenames in os.walk(sys.argv[1]):
+           for filename in fnmatch.filter(filenames, '*'):
+               matches.append(os.path.join(root, filename))
+    #single file
+    if os.path.isfile(argv[1]):
+        matches.append(argv[1])
+
     for match in matches:
         this_dict = {}
         av_result = av_results(match).split(':')[-1].strip()

@@ -16,8 +16,6 @@ RUN freshclam
 
 VOLUME /var/lib/clamav
 
-RUN mkdir /data
-
 COPY run.py /
 
 CMD freshclam -d; python run.py
