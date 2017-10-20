@@ -36,14 +36,16 @@ def main():
     matches = []
     ret_val = dict()
 
+    starting_point = sys.argv[0]
+
     #directory
-    if os.path.isdir(sys.argv[1]):
-        for root, dirnames, filenames in os.walk(sys.argv[1]):
+    if os.path.isdir(starting_point):
+        for root, dirnames, filenames in os.walk(starting_point):
            for filename in fnmatch.filter(filenames, '*'):
                matches.append(os.path.join(root, filename))
     #single file
-    if os.path.isfile(argv[1]):
-        matches.append(argv[1])
+    if os.path.isfile(starting_point):
+        matches.append(starting_point)
 
     for match in matches:
         this_dict = {}
