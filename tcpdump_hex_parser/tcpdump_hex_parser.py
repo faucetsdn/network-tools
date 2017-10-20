@@ -77,6 +77,7 @@ def parse_header(line):
     else:
         pass
         #do something else
+    ret_dict['tool'] = "tcpdump_hex_parser"
     return ret_dict
 
 
@@ -91,6 +92,7 @@ def parse_data(line, length):
 
 def return_packet(line_source):
     """Create a packet dictionary
+    'tool' field -> tcpdump hex parser (i.e., this tool)
     'data' field -> ascii hex values of the packet header and data
     'time' field -> time of packet capture
     'date' field -> date of packet capture
