@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 MAINTAINER dgrossman@iqt.org
 
 RUN apt-get update; apt-get install -y \
