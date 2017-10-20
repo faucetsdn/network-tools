@@ -59,5 +59,6 @@ def main():
 
 
 if __name__ == "__main__":
-    out = main()
-    print(out)
+    if len(sys.argv) > 1:
+        out = main()
+        print(out)
