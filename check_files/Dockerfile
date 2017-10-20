@@ -2,8 +2,8 @@ FROM ubuntu:14.04
 MAINTAINER MarvAmBass
 
 RUN apt-get update; apt-get install -y \
-    python3.6 \
-    python-pip3 \
+    python3 \
+    python-pip \
     clamav \
     clamav-freshclam
 
