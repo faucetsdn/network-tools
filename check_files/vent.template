@@ -4,3 +4,6 @@ groups = cpu
 
 [settings]
 ext_types = *
+
+[docker]
+environment = ["VIRUSTOTAL_KEY":"KEY"]
