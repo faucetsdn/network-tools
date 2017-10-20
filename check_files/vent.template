@@ -3,7 +3,7 @@ name = check_files
 groups = cpu
 
 [settings]
-ext_types = *
+ext_types = *.exe
 
 [docker]
 environment = ["VIRUSTOTAL_KEY":"KEY"]
