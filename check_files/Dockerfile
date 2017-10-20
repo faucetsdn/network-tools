@@ -10,8 +10,6 @@ RUN apt-get update; apt-get install -y \
     clamav \
     clamav-freshclam
 
-RUN pip install watchdog
-
 RUN freshclam
 
 VOLUME /var/lib/clamav
