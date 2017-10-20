@@ -27,7 +27,7 @@ def hash_results(p):
 
 
 def av_results(p):
-    p = subprocess.Popen(['clamscan', '--no-summary', p],
+    p = subprocess.Popen(['/usr/bin/clamscan', '--no-summary', p],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     a = p.stdout.read()
     return a
@@ -61,5 +61,5 @@ def main():
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         out = main()
-        retval = {'answer':out} 
+        retval = {'answer': out}
         print(retval)
