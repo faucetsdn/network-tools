@@ -17,5 +17,5 @@ VOLUME /var/lib/clamav
 COPY run.py /
 
 #ENTRYPOINT freshclam -d; python run.py
-ENTRYPOINT python run.py
+ENTRYPOINT ["python", "run.py"]
 CMD [""]
