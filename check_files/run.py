@@ -63,3 +63,5 @@ if __name__ == "__main__":
         out = main()
         retval = {'answer': out}
         print(retval)
+    else:
+        print("so this is odd...{0}:{1}".format(str(len(sys.argv)), sys.argv))
