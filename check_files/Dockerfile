@@ -16,4 +16,5 @@ VOLUME /var/lib/clamav
 
 COPY run.py /
 
-CMD freshclam -d; python run.py
+ENTRYPOINT freshclam -d; python run.py
+CMD [""]
