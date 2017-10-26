@@ -10,11 +10,12 @@ RUN apt-get update; apt-get install -y \
     clamav \
     clamav-freshclam
 
-RUN freshclam
+#RUN freshclam
 
 VOLUME /var/lib/clamav
 
 COPY run.py /
 
-ENTRYPOINT freshclam -d; python run.py
+#ENTRYPOINT freshclam -d; python run.py
+ENTRYPOINT python run.py
 CMD [""]
