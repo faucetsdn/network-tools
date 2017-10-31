@@ -7,6 +7,7 @@ RUN apt-get update; apt-get install -y \
     python3-dev \
     python-dev \
     python-pip \
+    virustotal \
     clamav \
     clamav-freshclam
 
