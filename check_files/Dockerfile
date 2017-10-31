@@ -1,5 +1,5 @@
 FROM ubuntu:16.04
-MAINTAINER dgrossman@iqt.org
+LABEL maintainer = "dgrossman@iqt.org"
 
 RUN apt-get update; apt-get install -y \
     python3 \
