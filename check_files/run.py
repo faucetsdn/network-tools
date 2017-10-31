@@ -49,31 +49,35 @@ def main(virus_key):
 
     # directory
     if os.path.isdir(starting_point):
+        #print('directory',starting_point)
         for root, dirnames, filenames in os.walk(starting_point):
             for filename in fnmatch.filter(filenames, '*'):
                 matches.append(os.path.join(root, filename))
     # single file
     if os.path.isfile(starting_point):
+        #print('file',starting_point)
         matches.append(starting_point)
 
     for match in matches:
         this_dict = {}
         av_result = av_results(match).split(':')[-1].strip()
         hash_result = hash_results(match)
-        this_dict['av_results'] = av_result
+        this_dict['clamav_results'] = av_result
         this_dict['hash_results'] = hash_result
         if v is not None:
             lookup = hash_result['md5']
             response = v.get_file_report(lookup)
-            this_dict['report'] = response
+            this_dict['virustotal_report'] = response
         else:
-            this_dict['report'] = None
+            this_dict['virustotal_report'] = None
+        ret_val[match]=this_dict 
 
     return ret_val
 
 
 if __name__ == "__main__":
     virus_key = os.getenv('VIRUS_TOTAL_API_KEY', 'UNCONFIGURED')
+    #print('av_key',virus_key)
     if len(sys.argv) > 1:
         out = main(virus_key)
         retval = {'answer': out}
