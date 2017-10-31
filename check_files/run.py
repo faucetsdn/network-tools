@@ -1,9 +1,12 @@
 #!/bin/env python
+from __future__ import print_function
 import fnmatch
 import os
 import sys
 import subprocess
 import hashlib
+import json
+from virus_total_apis import PublicApi as VirusTotalPublicApi
 
 
 def hash_results(p):
@@ -33,34 +36,50 @@ def av_results(p):
     return a
 
 
-def main():
+def main(virus_key):
     matches = []
     ret_val = dict()
 
     starting_point = sys.argv[1]
 
+    v = None
+
+    if virus_key != 'UNCONFIGURED':
+        v = VirusTotalPublicApi(virus_key)
+
     # directory
     if os.path.isdir(starting_point):
+        #print('directory',starting_point)
         for root, dirnames, filenames in os.walk(starting_point):
             for filename in fnmatch.filter(filenames, '*'):
                 matches.append(os.path.join(root, filename))
     # single file
     if os.path.isfile(starting_point):
+        #print('file',starting_point)
         matches.append(starting_point)
 
     for match in matches:
         this_dict = {}
         av_result = av_results(match).split(':')[-1].strip()
         hash_result = hash_results(match)
-        this_dict['av_results'] = av_result
+        this_dict['clamav_results'] = av_result
         this_dict['hash_results'] = hash_result
-        ret_val[match] = this_dict
+        if v is not None:
+            lookup = hash_result['md5']
+            response = v.get_file_report(lookup)
+            this_dict['virustotal_report'] = response
+        else:
+            this_dict['virustotal_report'] = None
+        ret_val[match]=this_dict 
+
     return ret_val
 
 
 if __name__ == "__main__":
+    virus_key = os.getenv('VIRUS_TOTAL_API_KEY', 'UNCONFIGURED')
+    print('av_key',virus_key[:4])
     if len(sys.argv) > 1:
-        out = main()
+        out = main(virus_key)
         retval = {'answer': out}
         print(retval)
     else:

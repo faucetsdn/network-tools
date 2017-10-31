@@ -10,6 +10,10 @@ RUN apt-get update; apt-get install -y \
     clamav \
     clamav-freshclam
 
+COPY requirements.txt /
+RUN find . -name requirements.txt -type f -exec pip install -r {} \;
+
+
 RUN freshclam
 
 VOLUME /var/lib/clamav
