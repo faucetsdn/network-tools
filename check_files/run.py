@@ -4,7 +4,9 @@ import os
 import sys
 import subprocess
 import hashlib
-import virustotal
+from __future__ import print_function
+import json
+from virus_total_apis import PublicApi as VirusTotalPublicApi
 
 
 def hash_results(p):
@@ -43,7 +45,7 @@ def main(virus_key):
     v = None
 
     if virus_key != 'UNCONFIGURED':
-        v = virustotal.VirusTotal(virus_key)
+        v = VirusTotalPublicApi(virus_key)
 
     # directory
     if os.path.isdir(starting_point):
@@ -61,30 +63,12 @@ def main(virus_key):
         this_dict['av_results'] = av_result
         this_dict['hash_results'] = hash_result
         if v is not None:
-            report = v.get(hash_result['md5'])
-            # wait untin the report is generated
-            report.join()
-            rd = {}
-            rd['resource_id'] = report.id
-            rd['scan_uid'] = report.scan_id
-            rd['permalink'] = report.permalink
-            rd['status'] = report.status
-            rd['total'] = report.total
-            rd['positives'] = report.positives
-            md = {}
-            for av, malware in report:
-                if malware is not None:
-                    avd = {}
-                    avd['version'] = av[1]
-                    avd['update'] = av[2]
-                    avd['malware'] = malware
-                md[av[0]] = avd
-            rd['av'] = md
-            this_dict['av_results'] = rd
+            lookup = hash_result['md5']
+            response = v.get_file_report(lookup)
+            this_dict['report'] = response
         else:
-            this_dict['av_results'] = None
+            this_dict['report'] = None
 
-        ret_val[match] = this_dict
     return ret_val
 
 
