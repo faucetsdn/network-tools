@@ -1,5 +1,5 @@
 FROM ubuntu:16.04
-MAINTAINER Charlie Lewis <clewis@iqt.org>
+LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 RUN apt-get update && apt-get install --no-install-recommends -y git \
     make \
