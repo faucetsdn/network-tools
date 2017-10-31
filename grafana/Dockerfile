@@ -1,2 +1,2 @@
 FROM grafana/grafana:latest
-MAINTAINER Charlie Lewis <clewis@iqt.org>
+LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
