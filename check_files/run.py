@@ -77,7 +77,7 @@ def main(virus_key):
 
 if __name__ == "__main__":
     virus_key = os.getenv('VIRUS_TOTAL_API_KEY', 'UNCONFIGURED')
-    #print('av_key',virus_key)
+    print('av_key',virus_key[:4])
     if len(sys.argv) > 1:
         out = main(virus_key)
         retval = {'answer': out}
