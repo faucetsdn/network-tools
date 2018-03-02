@@ -1,1 +1,1 @@
-virustotal-api
+virustotal-api==1.1.9
