@@ -10,7 +10,7 @@ RUN apk update && \
     rm -rf /root/* && \
     rm -rf /var/cache/apk/*
 
-ADD . /scripts
+COPY . /scripts
 
 ENTRYPOINT ["/scripts/run.sh"]
 CMD [""]
