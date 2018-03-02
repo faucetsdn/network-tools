@@ -6,11 +6,14 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
 # Install packages
 RUN apk update && \
     apk -U upgrade && \
-    apk add bash jansson libpcap procps p0f && \
+    apk add bash jansson libpcap procps python py-pip p0f && \
     rm -rf /root/* && \
     rm -rf /var/cache/apk/*
 
-COPY . /scripts
+COPY . /app
+WORKDIR /app
 
-ENTRYPOINT ["/scripts/run.sh"]
+RUN pip install -r requirements.txt
+
+ENTRYPOINT ["python", "app.py"]
 CMD [""]
