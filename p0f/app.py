@@ -24,24 +24,23 @@ def connect():
         try:
             r = redis.StrictRedis(host='localhost', port=6379, db=0)
         except Exception as e:  # pragma: no cover
-            return (False, 'unable to connect to redis because: ' + str(e))
+            print('unable to connect to redis because: ' + str(e))
     return r
 
 def save(r, results):
     if r:
         try:
-            r.hmset('foo', results)
+            for key in results:
+                r.hmset(key, results[key])
         except Exception as e:  # pragma: no cover
-            return (False,
-                    'unable to store contents of the p0f [ ' +
-                    str(results) + ' ] in redis because: ' +
-                    str(e))
+            print('unable to store contents of the p0f [ ' + str(results) +
+                  ' ] in redis because: ' + str(e))
     return
 
 def main():
     run_p0f()
     results = parse_output()
-    print results
+    print(results)
     r = connect()
     save(r, results)
     return
