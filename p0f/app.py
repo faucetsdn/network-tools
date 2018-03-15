@@ -32,7 +32,7 @@ def save(r, results):
         try:
             for key in results:
                 r.hmset(key, results[key])
-                r.sadd(key)
+                r.sadd('ip_addresses', key)
         except Exception as e:  # pragma: no cover
             print('unable to store contents of the p0f [ ' + str(results) +
                   ' ] in redis because: ' + str(e))
