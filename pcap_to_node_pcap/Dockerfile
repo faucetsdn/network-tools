@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
-MAINTAINER Blake Pagon <bpagon@iqt.org>
 
-LABEL vent = "" \
+LABEL maintainer = "Blake Pagon <bpagon@iqt.org>" \
+      vent = "" \
       vent.name = "node pcap" \
       vent.groups = "pcap"
 

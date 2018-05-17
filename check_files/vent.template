@@ -4,3 +4,6 @@ groups = cpu
 
 [settings]
 ext_types = exe
+
+[docker]
+environment = ["VIRUS_TOTAL_API_KEY=UNCONFIGURED"]

@@ -1,5 +1,5 @@
 FROM ubuntu:16.04
-MAINTAINER dgrossman@iqt.org
+LABEL maintainer = "dgrossman@iqt.org"
 
 RUN apt-get update; apt-get install -y \
     python3 \
@@ -9,6 +9,10 @@ RUN apt-get update; apt-get install -y \
     python-pip \
     clamav \
     clamav-freshclam
+
+COPY requirements.txt /
+RUN find . -name requirements.txt -type f -exec pip install -r {} \;
+
 
 RUN freshclam
 
