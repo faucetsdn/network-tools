@@ -1,9 +1,8 @@
 """
-Plugin that takes pcap files and splits them by server and client
-ip addresses
+Plugin that takes pcap files and rewrites them without .1Q VLAN tags
 
-Created on 17 July 2017
-@author: Blake Pagon
+Created on 17 May 2018
+@author: Charlie Lewis
 """
 
 import datetime
@@ -21,8 +20,8 @@ def get_path():
     return path
 
 def run_tool(path):
-    # need to make directories to store results from pcapsplitter
-    base_dir = path.rsplit('/', 1)[0]
+    # need to make directories to store results from tcprewrite
+    base_dir, file_name = path.rsplit('/', 1)
     timestamp = ""
     try:
         timestamp = '-'.join(str(datetime.datetime.now()).split(' ')) + '-UTC'
@@ -30,19 +29,14 @@ def run_tool(path):
     except Exception as e:
         print("couldn't create output directory with unique timestamp")
     # make directory for tool name recognition of piping to other tools
-    output_dir = os.path.join(base_dir, 'pcap-node-splitter' + '-' + timestamp)
+    output_dir = os.path.join(base_dir, 'tcprewrite-dot1q' + '-' + timestamp)
     try:
         os.mkdir(output_dir)
-        os.mkdir(output_dir + '/clients')
-        os.mkdir(output_dir + '/servers')
     except OSError:
         print("couldn't make directories for output of this tool")
     try:
-        subprocess.check_call(shlex.split("./PcapPlusPlus/Examples/PcapSplitter/Bin/PcapSplitter -f " +
-                                          path + " -o " + output_dir + '/clients' + " -m client-ip"))
-
-        subprocess.check_call(shlex.split("./PcapPlusPlus/Examples/PcapSplitter/Bin/PcapSplitter -f " +
-                                          path + " -o " + output_dir + '/servers' + " -m server-ip"))
+        subprocess.check_call(shlex.split("tcprewrite --enet-vlan=del --infile=" + path +
+                                          " --outfile=" + output_dir + '/' + file_name))
     except Exception as e:
         print(str(e))
 
