@@ -4,4 +4,5 @@ groups = pcap
 
 [settings]
 ext_types = pcap
-process_base = yes
+process_base = no
+process_from_tool = tcprewrite dot1q
