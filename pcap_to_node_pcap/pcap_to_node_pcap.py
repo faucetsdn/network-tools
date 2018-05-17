@@ -22,7 +22,7 @@ def get_path():
 
 def run_tool(path):
     # need to make directories to store results from pcapsplitter
-    base_dir = path.rsplit('/', 1)[0]
+    base_dir = path.rsplit('/', 2)[0]
     timestamp = ""
     try:
         timestamp = '-'.join(str(datetime.datetime.now()).split(' ')) + '-UTC'
