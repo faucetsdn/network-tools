@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 RUN apt-get update && apt-get install --no-install-recommends -y git \
