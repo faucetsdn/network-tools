@@ -21,6 +21,10 @@ def get_path():
     return path
 
 def run_tool(path):
+    if os.path.getsize(path) < 100:
+       print("pcap file too small, not splitting")
+       return
+
     # need to make directories to store results from pcapsplitter
     base_dir = path.rsplit('/', 1)[0]
     timestamp = ""
