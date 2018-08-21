@@ -6,9 +6,10 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
 # Install packages
 RUN apk update && \
     apk -U upgrade && \
-    apk add bash jansson libpcap procps python py-pip p0f && \
+    apk add bash jansson libpcap procps python py-pip p0f tshark && \
     rm -rf /root/* && \
     rm -rf /var/cache/apk/*
+RUN pip install -U pip
 
 COPY . /app
 WORKDIR /app
