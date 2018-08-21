@@ -3,17 +3,28 @@ import redis
 import sys
 
 def run_p0f():
-    os.system('/usr/bin/p0f -r ' + sys.argv[1] + ' -o /tmp/output.txt > /dev/null')
+    os.system('/usr/bin/p0f -r ' + sys.argv[1] + ' -o /tmp/p0f_output.txt > /dev/null')
+    return
+
+def run_tshark():
+    os.system('/usr/bin/tshark -r ' + sys.argv[1] + ' -T fields -e ip.src -e eth.src | sort | uniq > /tmp/tshark_output.txt')
+    os.system('/usr/bin/tshark -r ' + sys.argv[1] + ' -T fields -e ip.dst -e eth.dst | sort | uniq >> /tmp/tshark_output.txt')
     return
 
 def parse_output():
     results = {}
-    with open('/tmp/output.txt', 'r') as f:
+    with open('/tmp/p0f_output.txt', 'r') as f:
         for line in f:
             l = " ".join(line.split()[2:])
             l = l.split('|')
             if l[0] == 'mod=syn':
                 results[l[1].split('cli=')[1].split('/')[0]] = {'full_os': l[4].split('os=')[1], 'short_os': l[4].split('os=')[1].split()[0]}
+    with open('/tmp/tshark_output.txt', 'r') as f:
+        for line in f:
+            pair = line.split()
+            if len(pair) == 2:
+                if pair[0] in results:
+                    results[pair[0]]['mac'] = pair[1]
     return results
 
 def connect():
@@ -46,6 +57,7 @@ def save(r, results):
 
 def main():
     run_p0f()
+    run_tshark()
     results = parse_output()
     print(results)
     r = connect()
