@@ -20,6 +20,10 @@ def get_path():
     return path
 
 def run_tool(path):
+    if os.path.getsize(path) == 0:
+       print("pcap file empty, not rewriting")
+       return
+
     # need to make directories to store results from tcprewrite
     base_dir, file_name = path.rsplit('/', 1)
     timestamp = ""
