@@ -1,0 +1,16 @@
+sudo: required
+dist: trusty
+group: edge
+
+language: python
+cache: pip
+python:
+  - "3.6"
+install:
+  - pip3 install codecov pytest-cov
+before_install:
+  - sudo apt-get update
+jobs:
+  include:
+  - stage: test
+    script: find . -name requirements.txt -type f -exec pip3 install -r {} \; && make test && bash <(curl -s https://codecov.io/bash)
