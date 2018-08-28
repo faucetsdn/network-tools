@@ -6,6 +6,8 @@ language: python
 cache: pip
 python:
   - "3.6"
+install:
+  - pip install codecov
 before_install:
   - sudo apt-get update
 jobs:
