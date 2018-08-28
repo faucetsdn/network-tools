@@ -7,7 +7,7 @@ cache: pip
 python:
   - "3.6"
 install:
-  - pip3 install codecov pytest
+  - pip3 install codecov pytest-cov
 before_install:
   - sudo apt-get update
 jobs:
