@@ -1,0 +1,14 @@
+sudo: required
+dist: trusty
+group: edge
+
+language: python
+cache: pip
+python:
+  - "3.6"
+before_install:
+  - sudo apt-get update
+jobs:
+  include:
+  - stage: test
+    script: make test && bash <(curl -s https://codecov.io/bash)

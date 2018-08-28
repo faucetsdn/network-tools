@@ -24,8 +24,8 @@ Created on 28 October 2016
 import pytest
 import sys
 
-from csv_row_broadcast import get_path
-from csv_row_broadcast import run_tool
+from .csv_row_broadcast import get_path
+from .csv_row_broadcast import run_tool
 
 
 def test_get_path():

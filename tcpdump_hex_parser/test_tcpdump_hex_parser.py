@@ -25,11 +25,11 @@ import pytest
 import re
 import sys
 
-from tcpdump_hex_parser import get_path
-from tcpdump_hex_parser import parse_header
-from tcpdump_hex_parser import parse_data
-from tcpdump_hex_parser import return_packet
-from tcpdump_hex_parser import run_tool
+from .tcpdump_hex_parser import get_path
+from .tcpdump_hex_parser import parse_header
+from .tcpdump_hex_parser import parse_data
+from .tcpdump_hex_parser import return_packet
+from .tcpdump_hex_parser import run_tool
 
 def test_get_path():
     get_path()
