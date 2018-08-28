@@ -7,10 +7,10 @@ cache: pip
 python:
   - "3.6"
 install:
-  - pip install codecov
+  - pip3 install codecov pytest
 before_install:
   - sudo apt-get update
 jobs:
   include:
   - stage: test
-    script: make test && bash <(curl -s https://codecov.io/bash)
+    script: find . -name requirements.txt -type f -exec pip3 install -r {} \; && make test && bash <(curl -s https://codecov.io/bash)
