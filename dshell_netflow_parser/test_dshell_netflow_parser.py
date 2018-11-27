@@ -24,8 +24,8 @@ Created on 13 June 2016
 import pytest
 import sys
 
-from dshell_netflow_parser import get_path
-from dshell_netflow_parser import run_tool
+from .dshell_netflow_parser import get_path
+from .dshell_netflow_parser import run_tool
 
 def test_get_path():
     get_path()
