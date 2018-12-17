@@ -5,7 +5,6 @@ import os
 import sys
 import subprocess
 import hashlib
-import json
 from virus_total_apis import PublicApi as VirusTotalPublicApi
 
 
@@ -50,7 +49,7 @@ def main(virus_key):
     # directory
     if os.path.isdir(starting_point):
         #print('directory',starting_point)
-        for root, dirnames, filenames in os.walk(starting_point):
+        for root, _, filenames in os.walk(starting_point):
             for filename in fnmatch.filter(filenames, '*'):
                 matches.append(os.path.join(root, filename))
     # single file
