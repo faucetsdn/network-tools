@@ -4,14 +4,12 @@ LABEL vent = "" \
       vent.name = "node pcap" \
       vent.groups = "replay"
 
-RUN     apt-get -y update && \
-        apt-get -y upgrade
-RUN     apt-get -y install \
-        tcpreplay \
-        sudo
-RUN     apt-get clean && \
-        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-ADD     replay.sh .
+RUN apt-get -y update && apt-get install -y --no-install-recommends \
+    tcpreplay \
+    sudo \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+COPY replay.sh .
 
 ENTRYPOINT ["/replay.sh"]
 CMD [""]

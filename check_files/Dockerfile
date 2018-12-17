@@ -1,14 +1,16 @@
 FROM ubuntu:18.04
 LABEL maintainer = "dgrossman@iqt.org"
 
-RUN apt-get update; apt-get install -y \
+RUN apt-get update; apt-get install -y --no-install-recommends \
     python3 \
     libyaml-dev \
     python3-dev \
     python-dev \
     python-pip \
     clamav \
-    clamav-freshclam
+    clamav-freshclam \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /
 RUN find . -name requirements.txt -type f -exec pip install -r {} \;

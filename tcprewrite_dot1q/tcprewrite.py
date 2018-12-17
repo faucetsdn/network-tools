@@ -15,8 +15,8 @@ def get_path():
     path = None
     try:
         path = sys.argv[1]
-    except:
-        print("No path provided, quitting")
+    except Exception as e:
+        print("No path provided: {0}, quitting".format(str(e)))
     return path
 
 def run_tool(path):

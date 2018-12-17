@@ -28,8 +28,8 @@ def get_path():
     path = None
     try:
         path = sys.argv[1]
-    except:
-        print("no path provided, quitting.")
+    except Exception as e:
+        print("no path provided: {0}, quitting.".format(str(e)))
     return path
 
 def parse_header(line):
@@ -69,7 +69,8 @@ def parse_header(line):
     ret_dict['ethernet_type'] = h[2]
     try:
         ret_dict['length'] = int(h[-1])
-    except:
+    except Exception as e:
+        print("failed to get length because: {0}, setting it to 0".format(str(e)))
         ret_dict['length'] = 0
     if h[2] == 'IP':
         #do something meaningful
@@ -84,7 +85,7 @@ def parse_header(line):
 def parse_data(line, length):
     """Parse hex data from tcpdump of pcap file"""
     ret_str = ''
-    h, d = line.split(':', 1)
+    _, d = line.split(':', 1)
     ret_str = d.strip().replace(' ', '')
     if length != 0:
         ret_str = ret_str[:-(2*length)]

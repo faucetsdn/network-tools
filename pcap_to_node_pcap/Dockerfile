@@ -5,13 +5,16 @@ LABEL maintainer = "Blake Pagon <bpagon@iqt.org>" \
       vent.name = "node pcap" \
       vent.groups = "pcap"
 
-RUN apt-get update && apt-get install --no-install-recommends -y git \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
     python \
     python-pip \
     libpcap-dev \
     make \
     gcc \
-    g++
+    g++ \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/seladb/PcapPlusPlus.git /PcapPlusPlus
 
