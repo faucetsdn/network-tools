@@ -33,11 +33,11 @@ def test_get_path():
     get_path()
 
 def test_run_tool():
-    with open('/tmp/test', 'w') as f:
+    with open('test', 'w') as f:
         f.write("this is a test file")
-    run_tool('/tmp/test')
+    run_tool('test')
 
-    with open('/tmp/results.out', 'w') as f:
+    with open('results.out', 'w') as f:
         f.write("2015-05-20 19:41:59.300879      0.0.0.0 ->    0.0.0.0  (US -> US)  TCP    1940   49152     0      0        0        0  0.0000s")
-    run_tool('/tmp/results.out')
+    run_tool('results.out')
 

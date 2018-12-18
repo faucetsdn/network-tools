@@ -34,10 +34,10 @@ def get_path():
 
 def run_tool(path):
     """Tool entry point"""
-    subprocess.Popen('/Dshell/dshell-decode -o /tmp/results.out -d netflow '+path,
+    subprocess.Popen('/Dshell/dshell-decode -o results.out -d netflow '+path,
                      shell=True, stdout=subprocess.PIPE).wait()
     try:
-        with open('/tmp/results.out', 'r') as f:
+        with open('results.out', 'r') as f:
             for rec in f:
                 data = {}
                 rec = rec.strip()
@@ -58,11 +58,11 @@ def run_tool(path):
                     data["dst_bytes"] = fields[14].strip()
                     data["duration"] = fields[15].strip()
                     data["tool"] = "dshell_netflow"
-                    print( str(data))
-                except:
-                    pass
-    except:
-        pass
+                    print(str(data))
+                except Exception as e:
+                    print('failed to create dict because: {0}'.format(str(e)))
+    except Exception as e:
+        print('failed process results because: {0}'.format(str(e)))
 
 if __name__ == '__main__':
     path = get_path()
