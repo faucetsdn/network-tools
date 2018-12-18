@@ -69,7 +69,7 @@ def main(virus_key):
             this_dict['virustotal_report'] = response
         else:
             this_dict['virustotal_report'] = None
-        ret_val[match]=this_dict 
+        ret_val[match]=this_dict
 
     return ret_val
 
