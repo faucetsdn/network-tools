@@ -42,10 +42,10 @@ def run_tool(path):
     except OSError:
         print("couldn't make directories for output of this tool")
     try:
-        subprocess.check_call(shlex.split("./PcapPlusPlus/Examples/PcapSplitter/Bin/PcapSplitter -f " +
+        subprocess.check_call(shlex.split("./PcapSplitter -f " +
                                           path + " -o " + output_dir + '/clients' + " -m client-ip"))
 
-        subprocess.check_call(shlex.split("./PcapPlusPlus/Examples/PcapSplitter/Bin/PcapSplitter -f " +
+        subprocess.check_call(shlex.split("./PcapSplitter -f " +
                                           path + " -o " + output_dir + '/servers' + " -m server-ip"))
     except Exception as e:
         print(str(e))

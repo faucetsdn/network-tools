@@ -1,32 +1,37 @@
-FROM ubuntu:18.04
+FROM debian:stretch-slim
 
-LABEL maintainer = "Blake Pagon <bpagon@iqt.org>" \
+LABEL maintainer = "Charlie Lewis <clewis@iqt.org>" \
       vent = "" \
       vent.name = "node pcap" \
       vent.groups = "pcap"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
-    python \
-    python-pip \
+    python3 \
     libpcap-dev \
     make \
     gcc \
     g++ \
+    && GIT_SSL_NO_VERIFY=true git clone https://github.com/seladb/PcapPlusPlus.git /PcapPlusPlus \
+    && cd /PcapPlusPlus \
+    && /bin/bash ./configure-linux.sh --default \
+    && make all \
+    && cd / \
+    && cp /PcapPlusPlus/Examples/PcapSplitter/Bin/PcapSplitter /PcapSplitter \
+    && rm -rf /PcapPlusPlus \
+    && apt-get remove --purge --auto-remove -y git make gcc g++ \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN git clone https://github.com/seladb/PcapPlusPlus.git /PcapPlusPlus
-
-WORKDIR /PcapPlusPlus
-
-RUN ["/bin/bash", "./configure-linux.sh", "--default"]
-
-RUN make all
-
-WORKDIR /
+    && apt-get autoclean \
+    && apt-get autoremove \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* /var/tmp/* \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -f /var/cache/apt/archives/*.deb \
+        /var/cache/apt/archives/partial/*.deb \
+        /var/cache/apt/*.bin \
+    && rm -rf /root/.[acpw]*
 
 COPY pcap_to_node_pcap.py pcap_to_node_pcap.py
 
-ENTRYPOINT ["python", "pcap_to_node_pcap.py"]
+ENTRYPOINT ["python3", "pcap_to_node_pcap.py"]
 CMD [""]

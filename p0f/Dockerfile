@@ -14,7 +14,7 @@ RUN pip install -U pip
 COPY . /app
 WORKDIR /app
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 ENTRYPOINT ["python", "app.py"]
 CMD [""]
