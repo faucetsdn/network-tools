@@ -74,7 +74,7 @@ def main(virus_key):
     return ret_val
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     virus_key = os.getenv('VIRUS_TOTAL_API_KEY', 'UNCONFIGURED')
     print('av_key',virus_key[:4])
     if len(sys.argv) > 1:
