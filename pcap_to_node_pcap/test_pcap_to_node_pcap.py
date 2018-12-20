@@ -19,6 +19,9 @@ def test_get_path():
 
 def test_run_tool():
     with open('/tmp/test', 'w') as f:
+        f.write("This is an invalid test")
+    run_tool('/tmp/test')
+    with open('/tmp/test', 'w') as f:
         for x in range(100):
             f.write("This is an invalid test")
     run_tool('/tmp/test')
