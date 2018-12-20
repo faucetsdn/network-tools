@@ -11,18 +11,19 @@ from .run import hash_results
 from .run import av_results
 from .run import main
 
-
-def test_hash_results():
+def create_test_file():
     with open('/tmp/test', 'w') as f:
         f.write("This is an invalid test")
-    hash_results('/tmp/test')
+    return '/tmp/test'
+
+def test_hash_results():
+    hash_results(create_test_file())
 
 
 def test_av_results():
-    with open('/tmp/test', 'w') as f:
-        f.write("This is an invalid test")
-    av_results('/tmp/test')
+    av_results(create_test_file())
 
 
 def test_main():
+    sys.argv = ['app', create_test_file())
     main('UNCONFIGURED')
