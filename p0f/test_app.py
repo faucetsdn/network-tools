@@ -31,7 +31,7 @@ def create_test_file():
         f.write("[2017/09/13 06:19:04] mod=mtu|cli=10.231.83.14/40300|srv=10.101.99.207/4506|subj=srv|link=???|raw_mtu=1436\n")
         f.write("[2017/09/13 06:19:04] mod=uptime|cli=10.231.83.14/40300|srv=10.101.99.207/4506|subj=srv|uptime=6 days 13 hrs 4 min (modulo 198 days)|raw_freq=249.52 Hz\n")
     with open('/tmp/tshark_output.txt', 'w') as f:
-        f.writeln("	00:00:00:7f:52:89\n")
+        f.write("	00:00:00:7f:52:89\n")
         f.write("	00:00:00:c5:1f:d4\n")
         f.write("10.231.83.14	00:00:00:c5:1f:d4\n")
         f.write("10.101.99.207	00:00:00:7f:52:89\n")

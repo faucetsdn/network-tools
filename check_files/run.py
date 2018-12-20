@@ -34,7 +34,7 @@ def av_results(p):
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a = p.stdout.read()
     except Exception as e:
-        a = None
+        a = ''
     return a
 
 
