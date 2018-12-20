@@ -34,7 +34,7 @@ def run_tool(path):
             message = json.dumps(row)
             print("{0}".format(message))
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     path = get_path()
     if path:
         run_tool(path)

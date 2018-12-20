@@ -43,12 +43,12 @@ def run_tool(path):
                     data["duration"] = fields[15].strip()
                     data["tool"] = "dshell_netflow"
                     print(str(data))
-                except Exception as e:
+                except Exception as e:  # pragma: no cover
                     print('failed to create dict because: {0}'.format(str(e)))
     except Exception as e:
         print('failed process results because: {0}'.format(str(e)))
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     path = get_path()
     if path:
         run_tool(path)
