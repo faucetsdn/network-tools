@@ -1,4 +1,10 @@
 # vent-plugins
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b2860a6454354fb09e6e835dfe8d6163)](https://www.codacy.com/app/CyberReboot/vent-plugins?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=CyberReboot/vent-plugins&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.com/CyberReboot/vent-plugins.svg?branch=master)](https://travis-ci.com/CyberReboot/vent-plugins)
+[![codecov](https://codecov.io/gh/CyberReboot/vent-plugins/branch/master/graph/badge.svg)](https://codecov.io/gh/CyberReboot/vent-plugins)
+[![Docker Hub Downloads](https://img.shields.io/docker/pulls/cyberreboot/vent-plugins-p0f.svg)](https://hub.docker.com/u/cyberreboot)
+
 This project is a place for plug-ins that run on the [Vent](https://github.com/CyberReboot/vent) virutal appliance.
 
 Vent is a self-contained virtual appliance based on [boot2docker](http://boot2docker.io/) that provides a platform to collect and analyze data across a flexible set of tools and technologies. With Vent you can quickly deploy any combination of tools configured in whatever manner makes sense for the environment it is being deployed to and have it all be version controlled by default. See blog post at [Introducing Vent](https://blog.cyberreboot.org/introducing-vent-1d883727b624#.61kl2jgm1)
