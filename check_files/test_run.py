@@ -25,5 +25,5 @@ def test_av_results():
 
 
 def test_main():
-    sys.argv = ['app', create_test_file())
+    sys.argv = ['app', create_test_file()]
     main('UNCONFIGURED')
