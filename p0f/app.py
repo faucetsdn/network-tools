@@ -44,11 +44,17 @@ def save(r, results):
             if isinstance(results, list):
                 for result in results:
                     for key in result:
-                        r.hmset(key, result[key])
+                        redis_k = {}
+                        for k in result[key]:
+                            redis_k[k] = str(result[key][k])
+                        r.hmset(key, redis_k)
                         r.sadd('ip_addresses', key)
             elif isinstance(results, dict):
                 for key in results:
-                    r.hmset(key, results[key])
+                    redis_k = {}
+                    for k in results[key]:
+                        redis_k[k] = str(results[key][k])
+                    r.hmset(key, redis_k)
                     r.sadd('ip_addresses', key)
         except Exception as e:  # pragma: no cover
             print('unable to store contents of the p0f [ ' + str(results) +
