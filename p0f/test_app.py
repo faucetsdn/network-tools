@@ -14,25 +14,23 @@ from .app import connect
 from .app import save
 from .app import main
 
-
-def test_run_p0f():
+def create_test_file():
     with open('/tmp/test', 'w') as f:
         f.write("this is an invalid test file")
-    sys.argv = ['p0f', '/tmp/test']
+    return ['p0f', '/tmp/test']
+
+def test_run_p0f():
+    sys.argv = create_test_file()
     run_p0f()
 
 
 def test_run_tshark():
-    with open('/tmp/test', 'w') as f:
-        f.write("this is an invalid test file")
-    sys.argv = ['p0f', '/tmp/test']
+    sys.argv = create_test_file()
     run_tshark()
 
 
 def test_parse_output():
-    with open('/tmp/test', 'w') as f:
-        f.write("this is an invalid test file")
-    sys.argv = ['p0f', '/tmp/test']
+    sys.argv = create_test_file()
     run_p0f()
     run_tshark()
     parse_output()
@@ -52,7 +50,5 @@ def test_save():
 
 
 def test_main():
-    with open('/tmp/test', 'w') as f:
-        f.write("this is an invalid test file")
-    sys.argv = ['p0f', '/tmp/test']
+    sys.argv = create_test_file()
     main()
