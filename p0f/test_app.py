@@ -68,8 +68,6 @@ def test_run_tshark():
 
 def test_parse_output():
     sys.argv = create_test_file()
-    run_p0f()
-    run_tshark()
     parse_output()
 
 
