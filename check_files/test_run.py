@@ -4,7 +4,6 @@ Test module for run.py
 Created on 20 December 2018
 @author: Charlie Lewis
 """
-import pytest
 import sys
 
 from .run import hash_results

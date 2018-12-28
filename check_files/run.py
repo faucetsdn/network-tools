@@ -33,7 +33,8 @@ def av_results(p):
         p = subprocess.Popen(['/usr/bin/clamscan', '--no-summary', p],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a = p.stdout.read()
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
+        print(str(e))
         a = ''
     return a
 
