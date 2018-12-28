@@ -4,7 +4,6 @@ Test module for app.py
 Created on 20 December 2018
 @author: Charlie Lewis
 """
-import pytest
 import sys
 
 from .app import run_p0f

@@ -4,7 +4,6 @@ Test module for tcprewrite.py
 Created on 20 December 2018
 @author: Charlie Lewis
 """
-import pytest
 import sys
 
 from .tcprewrite import get_path
