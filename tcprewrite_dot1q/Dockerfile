@@ -6,11 +6,11 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
 # Install packages
 RUN apk update && \
     apk -U upgrade && \
-    apk add python tcpreplay && \
+    apk add python3 tcpreplay && \
     rm -rf /root/* && \
     rm -rf /var/cache/apk/*
 
 COPY tcprewrite.py tcprewrite.py
 
-ENTRYPOINT ["python", "tcprewrite.py"]
+ENTRYPOINT ["python3", "tcprewrite.py"]
 CMD [""]
