@@ -1,6 +1,7 @@
 import os
 import redis
 import sys
+import time
 
 def run_p0f():
     os.system('/usr/bin/p0f -r ' + sys.argv[1] + ' -o /tmp/p0f_output.txt > /dev/null')
@@ -39,6 +40,7 @@ def connect():
     return r
 
 def save(r, results):
+    timestamp = str(int(time.time()))
     if r:
         try:
             if isinstance(results, list):
@@ -48,14 +50,18 @@ def save(r, results):
                         for k in result[key]:
                             redis_k[k] = str(result[key][k])
                         r.hmset(key, redis_k)
+                        r.hmset('p0f_'+timestamp+'_'+key, redis_k)
                         r.sadd('ip_addresses', key)
+                        r.sadd('p0f_timestamps', timestamp)
             elif isinstance(results, dict):
                 for key in results:
                     redis_k = {}
                     for k in results[key]:
                         redis_k[k] = str(results[key][k])
                     r.hmset(key, redis_k)
+                    r.hmset('p0f_'+timestamp+'_'+key, redis_k)
                     r.sadd('ip_addresses', key)
+                    r.sadd('p0f_timestamps', timestamp)
         except Exception as e:  # pragma: no cover
             print('unable to store contents of the p0f [ ' + str(results) +
                   ' ] in redis because: ' + str(e))
