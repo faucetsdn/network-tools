@@ -1,4 +1,4 @@
-FROM python:3-alpine3.8
+FROM python:3-alpine3.9
 LABEL maintainer="Peter Bronez <pbronez@iqt.org>"
 
 COPY csv_row_broadcast.py csv_row_broadcast.py

@@ -36,7 +36,7 @@ def connect():
         try:
             r = redis.StrictRedis(host='localhost', port=6379, db=0)
         except Exception as e:  # pragma: no cover
-            print('unable to connect to redis because: ' + str(e))
+            print('Unable to connect to redis because: ' + str(e))
     return r
 
 def save(r, results):
@@ -63,8 +63,8 @@ def save(r, results):
                     r.sadd('ip_addresses', key)
                     r.sadd('p0f_timestamps', timestamp)
         except Exception as e:  # pragma: no cover
-            print('unable to store contents of the p0f [ ' + str(results) +
-                  ' ] in redis because: ' + str(e))
+            print('Unable to store contents of p0f: ' + str(results) +
+                  ' in redis because: ' + str(e))
     return
 
 def main():
