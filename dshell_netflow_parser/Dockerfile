@@ -20,7 +20,6 @@ RUN git clone https://github.com/USArmyResearchLab/Dshell.git
 # install geo
 WORKDIR /Dshell/share/GeoIP
 RUN wget http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz
-RUN wget http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz
 RUN wget http://download.maxmind.com/download/geoip/database/GeoLite2-ASN.tar.gz
 RUN gunzip ./*.gz
 
