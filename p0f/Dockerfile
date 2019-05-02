@@ -9,7 +9,7 @@ RUN apk update && \
     apk add bash jansson libpcap procps python3 py3-pip p0f tshark && \
     rm -rf /root/* && \
     rm -rf /var/cache/apk/*
-RUN pip3 install -U pip==19.0.3
+RUN pip3 install -U pip==19.1
 
 COPY . /app
 WORKDIR /app
