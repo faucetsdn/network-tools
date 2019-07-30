@@ -8,6 +8,7 @@ LABEL maintainer = "Charlie Lewis <clewis@iqt.org>" \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     python3 \
+    python3-pip \ 
     libpcap-dev \
     make \
     gcc \
@@ -31,6 +32,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         /var/cache/apt/*.bin \
     && rm -rf /root/.[acpw]*
 
+COPY VERSION VERSION
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 COPY pcap_to_node_pcap.py pcap_to_node_pcap.py
 
 ENTRYPOINT ["python3", "pcap_to_node_pcap.py"]
