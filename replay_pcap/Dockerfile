@@ -1,4 +1,4 @@
-FROM ubuntu:18.10
+FROM ubuntu:19.10
 LABEL maintainer="Jeff Wang <jwang@iqt.org>"
 LABEL vent = "" \
       vent.name = "node pcap" \
