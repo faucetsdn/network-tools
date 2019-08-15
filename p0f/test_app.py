@@ -57,12 +57,12 @@ def create_test_file():
 
 def test_run_p0f():
     sys.argv = create_test_file()
-    run_p0f()
+    run_p0f(sys.argv[1])
 
 
 def test_run_tshark():
     sys.argv = create_test_file()
-    run_tshark()
+    run_tshark(sys.argv[1])
 
 
 def test_parse_output():

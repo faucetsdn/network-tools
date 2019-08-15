@@ -1,15 +1,45 @@
+import datetime
+import json
 import os
-import redis
 import sys
 import time
 
-def run_p0f():
-    os.system('/usr/bin/p0f -r ' + sys.argv[1] + ' -o /tmp/p0f_output.txt > /dev/null')
+import pika
+import redis
+
+
+def connect_rabbit(host='messenger', port=5672, queue='task_queue'):
+    params = pika.ConnectionParameters(host=host, port=port)
+    connection = pika.BlockingConnection(params)
+    channel = connection.channel()
+    channel.queue_declare(queue=queue, durable=True)
+    return channel
+
+def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
+    channel.basic_publish(exchange=exchange,
+                          routing_key=routing_key,
+                          body=json.dumps(msg),
+                          properties=pika.BasicProperties(
+                          delivery_mode=2,
+                         ))
+    print(" [X] %s UTC %r %r" % (str(datetime.datetime.utcnow()),
+                                 str(msg['id']), str(msg['file_path'])))
     return
 
-def run_tshark():
-    os.system('/usr/bin/tshark -r ' + sys.argv[1] + ' -T fields -e ip.src -e eth.src | sort | uniq > /tmp/tshark_output.txt')
-    os.system('/usr/bin/tshark -r ' + sys.argv[1] + ' -T fields -e ip.dst -e eth.dst | sort | uniq >> /tmp/tshark_output.txt')
+def get_version():
+    version = ''
+    with open('VERSION', 'r') as f:
+        for line in f:
+            version = line.strip()
+    return version
+
+def run_p0f(path):
+    os.system('/usr/bin/p0f -r ' + path + ' -o /tmp/p0f_output.txt > /dev/null')
+    return
+
+def run_tshark(path):
+    os.system('/usr/bin/tshark -r ' + path + ' -T fields -e ip.src -e eth.src | sort | uniq > /tmp/tshark_output.txt')
+    os.system('/usr/bin/tshark -r ' + path + ' -T fields -e ip.dst -e eth.dst | sort | uniq >> /tmp/tshark_output.txt')
     return
 
 def parse_output():
@@ -68,12 +98,38 @@ def save(r, results):
     return
 
 def main():
-    run_p0f()
-    run_tshark()
-    results = parse_output()
+    pcap_paths = []
+    path = sys.argv[1]
+    if os.path.isdir(path):
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                if file.endswith(".pcap") or file.endswith(".pcapng") or file.endswith(".dump") or file.endswith(".capture"):
+                    pcap_paths.append(os.path.join(root, file))
+    else:
+        pcap_paths.append(path)
+
+    for path in pcap_paths:
+        run_p0f(path)
+        run_tshark(path)
+        results = parse_output()
     print(results)
-    r = connect()
-    save(r, results)
+
+    if 'redis' in os.environ and os.environ['redis'] == 'true':
+        r = connect()
+        save(r, results)
+
+    uid = ''
+    if 'id' in os.environ:
+        uid = os.environ['id']
+    if 'rabbit' in os.environ and os.environ['rabbit'] == 'true':
+        try:
+            channel = connect_rabbit()
+            body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'p0f', 'version': get_version()}}
+            send_rabbit_msg(body, channel)
+            body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'p0f', 'version': get_version()}}
+            send_rabbit_msg(body, channel)
+        except Exception as e:
+            print(str(e))
     return
 
 if __name__ == "__main__":  # pragma: no cover

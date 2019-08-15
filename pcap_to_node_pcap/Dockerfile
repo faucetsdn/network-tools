@@ -8,7 +8,7 @@ LABEL maintainer = "Charlie Lewis <clewis@iqt.org>" \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     python3 \
-    python3-pip \ 
+    python3-pip \
     libpcap-dev \
     make \
     gcc \
