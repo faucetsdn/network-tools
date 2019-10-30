@@ -36,7 +36,7 @@ def proto_annotate_pcaps(pcap_dir):
         try:
             pcap_json = json.loads(
                 subprocess.check_output(
-                    ['tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename]))
+                    ['./tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename]))
         except (json.decoder.JSONDecodeError, subprocess.CalledProcessError) as e:
             print(pcapfilename, str(e))
             continue

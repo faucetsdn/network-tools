@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     gcc \
     g++ \
+    tshark \
+    && cp `which tshark` /tshark \
     && GIT_SSL_NO_VERIFY=true git clone https://github.com/seladb/PcapPlusPlus.git /PcapPlusPlus \
     && cd /PcapPlusPlus \
     && /bin/bash ./configure-linux.sh --default \
