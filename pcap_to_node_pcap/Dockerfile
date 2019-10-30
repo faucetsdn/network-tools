@@ -5,6 +5,8 @@ LABEL maintainer = "Charlie Lewis <clewis@iqt.org>" \
       vent.name = "node pcap" \
       vent.groups = "pcap"
 
+ENV DEBIAN_FRONTEND = "noninteractive"
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     python3 \
@@ -13,6 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     gcc \
     g++ \
+    tshark \
+    && cp `which tshark` /tshark \
     && GIT_SSL_NO_VERIFY=true git clone https://github.com/seladb/PcapPlusPlus.git /PcapPlusPlus \
     && cd /PcapPlusPlus \
     && /bin/bash ./configure-linux.sh --default \
