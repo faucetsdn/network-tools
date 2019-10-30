@@ -5,7 +5,7 @@ group: edge
 language: python
 cache: pip
 python:
-  - "3.6"
+  - "3.7"
 install:
   - pip3 install codecov pytest-cov
 before_install:
