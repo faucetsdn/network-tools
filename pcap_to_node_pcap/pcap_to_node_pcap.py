@@ -34,10 +34,10 @@ def proto_annotate_pcaps(pcap_dir):
     for pcap_filename in pap_filenames:
         try:
             pcap_json = json.loads(
-                subprocess.check_output(
-                    ['./tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename]))
+                subprocess.check_output(shlex.split(' '.join(
+                    ['./tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename]))))
         except (json.decoder.JSONDecodeError, subprocess.CalledProcessError) as e:
-            print(pcapfilename, str(e))
+            print(pcap_filename, str(e))
             continue
         pcap_layers = []
         for packet_json in pcap_json:
