@@ -5,6 +5,8 @@ LABEL maintainer = "Charlie Lewis <clewis@iqt.org>" \
       vent.name = "node pcap" \
       vent.groups = "pcap"
 
+ENV DEBIAN_FRONTEND = "noninteractive"
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     python3 \
