@@ -41,5 +41,7 @@ COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 COPY pcap_to_node_pcap.py pcap_to_node_pcap.py
 
+USER nobody
+
 ENTRYPOINT ["python3", "pcap_to_node_pcap.py"]
 CMD [""]

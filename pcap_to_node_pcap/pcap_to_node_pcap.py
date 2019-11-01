@@ -33,9 +33,9 @@ def proto_annotate_pcaps(pcap_dir):
         if pcap.is_file() and pcap.path.endswith('pcap')]
     for pcap_filename in pap_filenames:
         try:
-            pcap_json = json.loads(
-                subprocess.check_output(shlex.split(' '.join(
-                    ['./tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename]))))
+            response = subprocess.check_output(shlex.split(' '.join(
+                    ['./tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename])))
+            pcap_json = json.loads(response.decode("utf-8"))
         except (json.decoder.JSONDecodeError, subprocess.CalledProcessError) as e:
             print(pcap_filename, str(e))
             continue
