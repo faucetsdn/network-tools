@@ -1,7 +1,0 @@
-[info]
-name = DShell Feature generation from PCAPs
-groups = pcap
-
-[settings]
-ext_types = pcap
-process_base = yes
