@@ -48,7 +48,7 @@ def get_path():
         print("No path provided: {0}, quitting".format(str(e)))
     return path
 
-def run_tool(path):
+def run_capinfos(path):
     if os.path.getsize(path) == 0:
        print("pcap file empty, no stats")
        return
@@ -62,17 +62,38 @@ def run_tool(path):
         print(str(e))
     return output
 
+def run_tshark(path):
+    if os.path.getsize(path) == 0:
+       print("pcap file empty, no stats")
+       return
+
+    output = ''
+    try:
+        conv_endpoint_types = ['bluetooth', 'eth', 'fc', 'fddi', 'ip', 'ipv6', 'ipx', 'jxta', 'ncp', 'rsvp', 'sctp', 'tcp', 'tr', 'usb', 'udp', 'wlan']
+        options = '-q -z dns,tree -z io,phs -z icmp,srt -z icmpv6,srt'
+        options += ' -z conv,'.join(conv_endpoint_types)
+        options += ' -z endpoints,'.join(conv_endpoint_types)
+        output = subprocess.check_output(shlex.split(' '.join(['tshark', '-r', path, options])))
+        output = output.decode("utf-8")
+        print(output)
+    except Exception as e:
+        print(str(e))
+    return output
+
 if __name__ == '__main__':  # pragma: no cover
     path = get_path()
     if path:
-        results = run_tool(path)
+        capinfos_results = run_capinfos(path)
+        tshark_results = run_tshark(path)
     uid = ''
     if 'id' in os.environ:
         uid = os.environ['id']
     if 'rabbit' in os.environ and os.environ['rabbit'] == 'true':
         try:
             channel = connect_rabbit()
-            body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'pcap_stats', 'version': get_version()}}
+            body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': capinfos_results, 'results': {'tool': 'pcap_stats', 'version': get_version()}}
+            send_rabbit_msg(body, channel)
+            body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': tshark_results, 'results': {'tool': 'pcap_stats', 'version': get_version()}}
             send_rabbit_msg(body, channel)
             body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'pcap_stats', 'version': get_version()}}
             send_rabbit_msg(body, channel)
