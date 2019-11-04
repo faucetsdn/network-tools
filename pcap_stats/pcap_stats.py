@@ -62,11 +62,44 @@ def run_capinfos(path):
         print(str(e))
     return output
 
+def parse_tshark(output):
+    results = {}
+    in_block = False
+    name = None
+    for line in output.split('\n'):
+        if line.startswith('==='):
+            if in_block:
+                in_block = False
+                name = None
+                continue
+            else:
+                in_block = True
+                continue
+        if in_block:
+            if not name:
+                name = line.strip()
+                results[name] = ''
+                continue
+            elif not line.startswith('Filter:') and line != '':
+                # TODO smarter parsing of contents needs to happen
+                results[name] += line + '\n'
+
+    # TODO temporary, remove later
+    for result in results:
+        print('name: {0}'.format(result))
+        print()
+        print('results:')
+        print(results[result])
+        print()
+
+    return results
+
 def run_tshark(path):
     if os.path.getsize(path) == 0:
        print("pcap file empty, no stats")
        return
 
+    results = {}
     output = ''
     try:
         conv_endpoint_types = ['bluetooth', 'eth', 'fc', 'fddi', 'ip', 'ipv6', 'ipx', 'jxta', 'ncp', 'rsvp', 'sctp', 'tcp', 'tr', 'usb', 'udp', 'wlan']
@@ -75,10 +108,13 @@ def run_tshark(path):
         options += ' -z endpoints,'.join(conv_endpoint_types)
         output = subprocess.check_output(shlex.split(' '.join(['tshark', '-r', path, options])))
         output = output.decode("utf-8")
+        # TODO temporary, remoove later
         print(output)
     except Exception as e:
         print(str(e))
-    return output
+
+    results = parse_tshark(output)
+    return results
 
 if __name__ == '__main__':  # pragma: no cover
     path = get_path()
