@@ -48,6 +48,35 @@ def get_path():
         print("No path provided: {0}, quitting".format(str(e)))
     return path
 
+def parse_capinfos(output):
+    results = {}
+    num_interfaces = 0
+    interface_dict = {}
+    interface = 0
+    interface_name = ''
+    for line in output.split('\n'):
+        if line == '':
+            continue
+        if line.startswith('Number of interfaces in file:'):
+            num_interfaces = int(line.split(':', 1)[1].strip())
+            continue
+        if interface < num_interfaces:
+            if line.startswith('Interface '):
+                interface_name = line.split()[1]
+                interface_dict[interface_name] = {}
+                continue
+            else:
+                if line.startswith('Number of packets '):
+                    interface += 1
+                name, value = line.split(' = ')
+                interface_dict[interface_name][name.strip()] = value.strip()
+                continue
+        name, value = line.split(':', 1)
+        results[name.strip()] = value.strip()
+    results['interfaces'] = interface_dict
+    print(results)
+    return results
+
 def run_capinfos(path):
     if os.path.getsize(path) == 0:
        print("pcap file empty, no stats")
@@ -57,10 +86,11 @@ def run_capinfos(path):
     try:
         output = subprocess.check_output(shlex.split(' '.join(['capinfos', path])))
         output = output.decode("utf-8")
-        print(output)
     except Exception as e:
         print(str(e))
-    return output
+
+    results = parse_capinfos(output)
+    return results
 
 def parse_tshark(output):
     results = {}
@@ -103,7 +133,7 @@ def run_tshark(path):
     output = ''
     try:
         conv_endpoint_types = ['bluetooth', 'eth', 'fc', 'fddi', 'ip', 'ipv6', 'ipx', 'jxta', 'ncp', 'rsvp', 'sctp', 'tcp', 'tr', 'usb', 'udp', 'wlan']
-        options = '-q -z dns,tree -z io,phs -z icmp,srt -z icmpv6,srt'
+        options = '-n -q -z dns,tree -z io,phs -z icmp,srt -z icmpv6,srt'
         options += ' -z conv,'.join(conv_endpoint_types)
         options += ' -z endpoints,'.join(conv_endpoint_types)
         output = subprocess.check_output(shlex.split(' '.join(['tshark', '-r', path, options])))
