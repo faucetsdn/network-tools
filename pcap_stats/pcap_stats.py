@@ -123,15 +123,71 @@ def parse_tshark(output):
                     continue
                 else:
                     src, _, dst, frames_l, bytes_l, frames_r, bytes_r, frames_total, bytes_total, rel_start, duration = line.split()
-                    conversations.append({'Source':src, 'Destination': dst, 'Frames to source': frames_l, 'Bytes to source': bytes_l, 'Frames to destination': frames_r, 'Bytes to destination': bytes_r, 'Total frames': frames_total, 'Bytes total': bytes_total, 'Relative start': rel_start, 'Duration': duration})
+                    conversations.append({'Source': src, 'Destination': dst, 'Frames to Source': frames_l, 'Bytes to Source': bytes_l, 'Frames to Destination': frames_r, 'Bytes to Destination': bytes_r, 'Total Frames': frames_total, 'Total Bytes': bytes_total, 'Relative Start': rel_start, 'Duration': duration})
             results['tshark'][result] = conversations
         elif 'Endpoints' in result:
             # handle endpoint parsing
-            continue
+            endpoints = []
+            for line in results['tshark'][result].split('\n'):
+                if line == '' or line.startswith(' '):
+                    # header or padding, dicard
+                    continue
+                else:
+                    # handle endpoint services with ports
+                    if result.startswith('UDP') or result.startswith('TCP') or result.startswith('STCP'):
+                        endpoint, port, packet_count, byte_count, tx_packets, tx_bytes, rx_packets, rx_bytes = line.split()
+                        endpoints.append({'Endpoint': endpoint, 'Port': port, 'Packets': packet_count, 'Bytes': byte_count, 'Tx Packets': tx_packets, 'Tx Bytes': tx_bytes, 'Rx Packets': rx_packets, 'Rx Bytes': rx_bytes})
+                    else:
+                        endpoint, packet_count, byte_count, tx_packets, tx_bytes, rx_packets, rx_bytes = line.split()
+                        endpoints.append({'Endpoint': endpoint, 'Packets': packet_count, 'Bytes': byte_count, 'Tx Packets': tx_packets, 'Tx Bytes': tx_bytes, 'Rx Packets': rx_packets, 'Rx Bytes': rx_bytes})
+            results['tshark'][result] = endpoints
         else:
             # handle weird stuff
-            continue
+            for line in results['tshark'][result].split('\n'):
+                if line == '' or line.startswith(' '):
+                    # header or padding, dicard
+                    continue
+                else:
+                    # handle icmp and icmpv6
+                    if result.startswith('ICMP'):
+                        if line.startswith('Requests') or line.startswith('Minimum'):
+                            # header
+                            results['tshark'][result] = {}
+                            continue
+                        else:
+                            values = line.split()
+                            if len(values) == 4:
+                                requests, replies, lost, percent_loss = values
+                                results['tshark'][result]['Requests'] = requests
+                                results['tshark'][result]['Replies'] = replies
+                                results['tshark'][result]['Lost'] = lost
+                                results['tshark'][result]['% Loss'] = percent_loss
+                            else:
+                                minimum, maximum, mean, median, s_deviation, min_frame, max_frame = values
+                                results['tshark'][result]['Minimum'] = minimum
+                                results['tshark'][result]['Maximum'] = maximum
+                                results['tshark'][result]['Mean'] = mean
+                                results['tshark'][result]['Median'] = median
+                                results['tshark'][result]['Standard Deviation'] = s_deviation
+                                results['tshark'][result]['Minimum Frame'] = min_frame
+                                results['tshark'][result]['Maximum Frame'] = max_frame
+                    # handle protocol hierarchy stats
+                    elif result.startswith('Protocol'):
+                        # TODO
+                        continue
+                    # handle dns
+                    elif result.startswith('DNS'):
+                        # TODO
+                        continue
 
+    # TODO temporarily remove until parsed
+    del results['tshark']['Protocol Hierarchy Statistics']
+    del results['tshark']['DNS']
+
+    # TODO add in condensed conversation fields
+    # ipv4, ipv6, tcp, udp
+
+    print(results)
     return results
 
 def run_tshark(path):
@@ -156,20 +212,23 @@ def run_tshark(path):
 
 if __name__ == '__main__':  # pragma: no cover
     path = get_path()
-    if path:
-        capinfos_results = run_capinfos(path)
-        tshark_results = run_tshark(path)
     uid = ''
     if 'id' in os.environ:
         uid = os.environ['id']
-    if 'rabbit' in os.environ and os.environ['rabbit'] == 'true':
-        try:
-            channel = connect_rabbit()
-            body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': capinfos_results, 'results': {'tool': 'pcap_stats', 'version': get_version()}}
-            send_rabbit_msg(body, channel)
-            body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': tshark_results, 'results': {'tool': 'pcap_stats', 'version': get_version()}}
-            send_rabbit_msg(body, channel)
-            body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'pcap_stats', 'version': get_version()}}
-            send_rabbit_msg(body, channel)
-        except Exception as e:
-            print(str(e))
+    if path:
+        if 'rabbit' in os.environ and os.environ['rabbit'] == 'true':
+            try:
+                channel = connect_rabbit()
+                capinfos_results = run_capinfos(path)
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': capinfos_results, 'results': {'tool': 'pcap_stats', 'version': get_version()}}
+                send_rabbit_msg(body, channel)
+                tshark_results = run_tshark(path)
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': tshark_results, 'results': {'tool': 'pcap_stats', 'version': get_version()}}
+                send_rabbit_msg(body, channel)
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'pcap_stats', 'version': get_version()}}
+                send_rabbit_msg(body, channel)
+            except Exception as e:
+                print(str(e))
+        else:
+            capinfos_results = run_capinfos(path)
+            tshark_results = run_tshark(path)
