@@ -187,11 +187,27 @@ def parse_tshark(output):
     if 'DNS' in results['tshark']:
         del results['tshark']['DNS']
 
-    # TODO add in condensed conversation fields
-    # ipv4, ipv6, tcp, udp
+    # add in condensed conversation fields
+    results['tshark']['Condensed TCP Conversations'] = condense_conversations(results, 'TCP Conversations')
+    results['tshark']['Condensed UDP Conversations'] = condense_conversations(results, 'UDP Conversations')
 
     print(results)
     return results
+
+def condense_conversations(results, conv_type):
+    prot_ip_map = {}
+    for conversation in results['tshark'][conv_type]:
+        src_ip, src_port = conversation['Source'].rsplit(':', 1)
+        dst_ip, dst_port = conversation['Destination'].rsplit(':', 1)
+        if not src_ip in prot_ip_map:
+            prot_ip_map[src_ip] = {'Destinations': [], 'Source Ports': [], 'Destination Ports': []}
+        if not src_port in prot_ip_map[src_ip]['Source Ports']:
+            prot_ip_map[src_ip]['Source Ports'].append(src_port)
+        if not dst_port in prot_ip_map[src_ip]['Destination Ports']:
+            prot_ip_map[src_ip]['Destination Ports'].append(dst_port)
+        if not dst_ip in prot_ip_map[src_ip]['Destinations']:
+            prot_ip_map[src_ip]['Destinations'].append(dst_ip)
+    return prot_ip_map
 
 def run_tshark(path):
     if os.path.getsize(path) == 0:
