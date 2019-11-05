@@ -49,7 +49,7 @@ def get_path():
     return path
 
 def parse_capinfos(output):
-    results = {}
+    results = {'capinfos':{}}
     num_interfaces = 0
     interface_dict = {}
     interface = 0
@@ -72,8 +72,8 @@ def parse_capinfos(output):
                 interface_dict[interface_name][name.strip()] = value.strip()
                 continue
         name, value = line.split(':', 1)
-        results[name.strip()] = value.strip()
-    results['interfaces'] = interface_dict
+        results['capinfos'][name.strip()] = value.strip()
+    results['capinfos']['interfaces'] = interface_dict
     print(results)
     return results
 
@@ -93,7 +93,7 @@ def run_capinfos(path):
     return results
 
 def parse_tshark(output):
-    results = {}
+    results = {'tshark':{}}
     in_block = False
     name = None
     for line in output.split('\n'):
@@ -107,20 +107,30 @@ def parse_tshark(output):
                 continue
         if in_block:
             if not name:
-                name = line.strip()
-                results[name] = ''
+                name = ''.join(line.split(':')).strip()
+                results['tshark'][name] = ''
                 continue
             elif not line.startswith('Filter:') and line != '':
-                # TODO smarter parsing of contents needs to happen
-                results[name] += line + '\n'
+                results['tshark'][name] += line + '\n'
 
-    # TODO temporary, remove later
-    for result in results:
-        print('name: {0}'.format(result))
-        print()
-        print('results:')
-        print(results[result])
-        print()
+    for result in results['tshark'].keys():
+        if 'Conversations' in result:
+            # handle conversation parsing
+            conversations = []
+            for line in results['tshark'][result].split('\n'):
+                if line == '' or line.startswith(' '):
+                    # header or padding, dicard
+                    continue
+                else:
+                    src, _, dst, frames_l, bytes_l, frames_r, bytes_r, frames_total, bytes_total, rel_start, duration = line.split()
+                    conversations.append({'Source':src, 'Destination': dst, 'Frames to source': frames_l, 'Bytes to source': bytes_l, 'Frames to destination': frames_r, 'Bytes to destionation': bytes_r, 'Total frames': frames_total, 'Bytes total': bytes_total, 'Relative start': rel_start, 'Duration': duration})
+            results['tshark'][result] = conversations
+        elif 'Endpoints' in result:
+            # handle endpoint parsing
+            continue
+        else:
+            # handle weird stuff
+            continue
 
     return results
 
@@ -138,8 +148,6 @@ def run_tshark(path):
         options += ' -z endpoints,'.join(conv_endpoint_types)
         output = subprocess.check_output(shlex.split(' '.join(['tshark', '-r', path, options])))
         output = output.decode("utf-8")
-        # TODO temporary, remoove later
-        print(output)
     except Exception as e:
         print(str(e))
 
