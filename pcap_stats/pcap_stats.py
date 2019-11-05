@@ -196,17 +196,18 @@ def parse_tshark(output):
 
 def condense_conversations(results, conv_type):
     prot_ip_map = {}
-    for conversation in results['tshark'][conv_type]:
-        src_ip, src_port = conversation['Source'].rsplit(':', 1)
-        dst_ip, dst_port = conversation['Destination'].rsplit(':', 1)
-        if not src_ip in prot_ip_map:
-            prot_ip_map[src_ip] = {'Destinations': [], 'Source Ports': [], 'Destination Ports': []}
-        if not src_port in prot_ip_map[src_ip]['Source Ports']:
-            prot_ip_map[src_ip]['Source Ports'].append(src_port)
-        if not dst_port in prot_ip_map[src_ip]['Destination Ports']:
-            prot_ip_map[src_ip]['Destination Ports'].append(dst_port)
-        if not dst_ip in prot_ip_map[src_ip]['Destinations']:
-            prot_ip_map[src_ip]['Destinations'].append(dst_ip)
+    if conv_type in results['tshark']:
+        for conversation in results['tshark'][conv_type]:
+            src_ip, src_port = conversation['Source'].rsplit(':', 1)
+            dst_ip, dst_port = conversation['Destination'].rsplit(':', 1)
+            if not src_ip in prot_ip_map:
+                prot_ip_map[src_ip] = {'Destinations': [], 'Source Ports': [], 'Destination Ports': []}
+            if not src_port in prot_ip_map[src_ip]['Source Ports']:
+                prot_ip_map[src_ip]['Source Ports'].append(src_port)
+            if not dst_port in prot_ip_map[src_ip]['Destination Ports']:
+                prot_ip_map[src_ip]['Destination Ports'].append(dst_port)
+            if not dst_ip in prot_ip_map[src_ip]['Destinations']:
+                prot_ip_map[src_ip]['Destinations'].append(dst_ip)
     return prot_ip_map
 
 def run_tshark(path):
