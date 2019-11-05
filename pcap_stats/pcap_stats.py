@@ -181,8 +181,10 @@ def parse_tshark(output):
                         continue
 
     # TODO temporarily remove until parsed
-    del results['tshark']['Protocol Hierarchy Statistics']
-    del results['tshark']['DNS']
+    if 'Protocol Hierarchy Statistics' in results['tshark']:
+        del results['tshark']['Protocol Hierarchy Statistics']
+    if 'DNS' in results['tshark']:
+        del results['tshark']['DNS']
 
     # TODO add in condensed conversation fields
     # ipv4, ipv6, tcp, udp
