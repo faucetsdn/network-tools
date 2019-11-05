@@ -123,7 +123,7 @@ def parse_tshark(output):
                     continue
                 else:
                     src, _, dst, frames_l, bytes_l, frames_r, bytes_r, frames_total, bytes_total, rel_start, duration = line.split()
-                    conversations.append({'Source':src, 'Destination': dst, 'Frames to source': frames_l, 'Bytes to source': bytes_l, 'Frames to destination': frames_r, 'Bytes to destionation': bytes_r, 'Total frames': frames_total, 'Bytes total': bytes_total, 'Relative start': rel_start, 'Duration': duration})
+                    conversations.append({'Source':src, 'Destination': dst, 'Frames to source': frames_l, 'Bytes to source': bytes_l, 'Frames to destination': frames_r, 'Bytes to destination': bytes_r, 'Total frames': frames_total, 'Bytes total': bytes_total, 'Relative start': rel_start, 'Duration': duration})
             results['tshark'][result] = conversations
         elif 'Endpoints' in result:
             # handle endpoint parsing
