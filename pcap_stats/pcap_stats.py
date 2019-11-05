@@ -150,9 +150,10 @@ def parse_tshark(output):
                 else:
                     # handle icmp and icmpv6
                     if result.startswith('ICMP'):
+                        if isinstance(results['tshark'][result], str):
+                            results['tshark'][result] = {}
                         if line.startswith('Requests') or line.startswith('Minimum'):
                             # header
-                            results['tshark'][result] = {}
                             continue
                         else:
                             values = line.split()
