@@ -60,7 +60,7 @@ def run_tool(path):
 
     print(output)
     print(alerts)
-    return output, alerts
+    return str(output), str(alerts)
 
 if __name__ == '__main__':  # pragma: no cover
     path = get_path()
