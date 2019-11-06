@@ -202,17 +202,17 @@ def parse_tshark(output):
     spaces = 0
     if h:
         h[0][0] = '{"' + h[0][0].strip()
-    while i < len(h):
-        prev_spaces = spaces
-        spaces = h[i][0].count('  ')
-        if spaces > prev_spaces:
-            h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '","'
-        elif spaces == prev_spaces:
-            h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"},"'
-        else:
-            h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"}' + ('}'*(prev_spaces-spaces)) + ',"'
-        i += 1
-    h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"}' + ('}'*(prev_spaces-spaces)) + '}'
+        while i < len(h):
+            prev_spaces = spaces
+            spaces = h[i][0].count('  ')
+            if spaces > prev_spaces:
+                h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '","'
+            elif spaces == prev_spaces:
+                h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"},"'
+            else:
+                h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"}' + ('}'*(prev_spaces-spaces)) + ',"'
+            i += 1
+        h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"}' + ('}'*(prev_spaces-spaces)) + '}'
 
     protocol_str = ''
     for record in h:
