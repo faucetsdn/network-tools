@@ -185,7 +185,9 @@ def parse_tshark(output):
         del results['tshark']['DNS']
 
     # handle protocol hierarchy stats
-    a = results['tshark']['Protocol Hierarchy Statistics'].split('\n')
+    a = []
+    if 'Protocol Hierarchy Statistics' in results['tshark']:
+        a = results['tshark']['Protocol Hierarchy Statistics'].split('\n')
     h = []
     for line in a:
         if line != '':
