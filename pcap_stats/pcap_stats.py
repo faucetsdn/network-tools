@@ -200,7 +200,8 @@ def parse_tshark(output):
 
     i = 1
     spaces = 0
-    h[0][0] = '{"' + h[0][0].strip()
+    if h:
+        h[0][0] = '{"' + h[0][0].strip()
     while i < len(h):
         prev_spaces = spaces
         spaces = h[i][0].count('  ')
