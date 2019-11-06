@@ -140,7 +140,7 @@ if __name__ == '__main__':  # pragma: no cover
     args = parser.parse_args()
     path = get_path(args.paths)
     if path:
-        result_path = run_tool(path, args.protoannotate)
+        result_path = run_tool(path, True)
     uid = ''
     if 'id' in os.environ:
         uid = os.environ['id']
