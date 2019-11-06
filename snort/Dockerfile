@@ -37,7 +37,7 @@ RUN apt-get update && \
         apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /opt/snort-${SNORT_VERSION}.tar.gz /opt/daq-${DAQ_VERSION}.tar.gz
 
 RUN ldconfig
-RUN touch /var/log/snort/alerts
+RUN touch /var/log/snort/alert
 
 COPY VERSION VERSION
 COPY requirements.txt requirements.txt

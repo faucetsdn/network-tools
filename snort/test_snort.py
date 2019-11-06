@@ -11,8 +11,7 @@ from .snort import run_tool
 
 
 def test_get_path():
-    get_path([])
-    get_path(['xxx'])
+    get_path()
 
 
 def test_run_tool():

@@ -54,7 +54,7 @@ def run_tool(path):
     try:
         output = subprocess.check_output(shlex.split("snort -c /etc/snort/etc/snort.conf -r " +
                                          path), stderr=subprocess.STDOUT)
-        alerts = subprocess.check_output(shlex.split("cat /var/log/snort/alerts"))
+        alerts = subprocess.check_output(shlex.split("cat /var/log/snort/alert"))
     except Exception as e:
         print(str(e))
 
