@@ -12,6 +12,8 @@ RUN mkdir -p /var/log/snort && \
 
 RUN apt-get update && \
     apt-get install -y \
+        python3 \
+        python3-pip \
         wget \
         build-essential \
         bison \
@@ -35,8 +37,14 @@ RUN apt-get update && \
         apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /opt/snort-${SNORT_VERSION}.tar.gz /opt/daq-${DAQ_VERSION}.tar.gz
 
 RUN ldconfig
+RUN touch /var/log/snort/alerts
+
+COPY VERSION VERSION
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
 COPY snortrules-snapshot-29150/ /etc/snort/
+COPY snort.py snort.py
 
-ENTRYPOINT ["snort"]
-CMD ["-h"]
+ENTRYPOINT ["python3", "snort.py"]
+CMD [""]
