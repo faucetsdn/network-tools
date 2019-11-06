@@ -214,9 +214,9 @@ def parse_tshark(output):
             i += 1
         h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"}' + ('}'*(prev_spaces-spaces)) + '}'
 
-    protocol_str = ''
+    protocol_str = '{}'
     for record in h:
-        protocol_str += record[0]
+        protocol_str = record[0]
     results['tshark']['Protocol Hierarchy Statistics'] = json.loads(protocol_str)
 
     # add in condensed conversation fields
