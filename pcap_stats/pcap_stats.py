@@ -172,7 +172,6 @@ def parse_tshark(output):
                                 results['tshark'][result]['Standard Deviation'] = s_deviation
                                 results['tshark'][result]['Minimum Frame'] = min_frame
                                 results['tshark'][result]['Maximum Frame'] = max_frame
-                    # handle protocol hierarchy stats
                     elif result.startswith('Protocol'):
                         # TODO
                         continue
@@ -182,10 +181,40 @@ def parse_tshark(output):
                         continue
 
     # TODO temporarily remove until parsed
-    if 'Protocol Hierarchy Statistics' in results['tshark']:
-        del results['tshark']['Protocol Hierarchy Statistics']
     if 'DNS' in results['tshark']:
         del results['tshark']['DNS']
+
+    # handle protocol hierarchy stats
+    a = results['tshark']['Protocol Hierarchy Statistics'].split('\n')
+    h = []
+    for line in a:
+        if line != '':
+            name, frame_count, byte_count = line.rsplit(' ', 2)
+            name = name.rstrip()
+            print(name)
+            frame_count = frame_count.split(':')[1]
+            byte_count = byte_count.split(':')[1]
+            h.append([name, frame_count, byte_count])
+
+    i = 1
+    spaces = 0
+    h[0][0] = '{"' + h[0][0].strip()
+    while i < len(h):
+        prev_spaces = spaces
+        spaces = h[i][0].count('  ')
+        if spaces > prev_spaces:
+            h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '","'
+        elif spaces == prev_spaces:
+            h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"},"'
+        else:
+            h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"}' + ('}'*(prev_spaces-spaces)) + ',"'
+        i += 1
+    h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"}' + ('}'*(prev_spaces-spaces)) + '}'
+
+    protocol_str = ''
+    for record in h:
+        protocol_str += record[0]
+    results['tshark']['Protocol Hierarchy Statistics'] = json.loads(protocol_str)
 
     # add in condensed conversation fields
     results['tshark']['Condensed TCP Conversations'] = condense_conversations(results, 'TCP Conversations')
