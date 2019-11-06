@@ -28,9 +28,10 @@ def ipaddress_fields(json_fields):
     return ipas
 
 def proto_annotate_pcaps(pcap_dir):
+    pcap_suffix = '.pcap'
     pap_filenames = [
         pcap.path for pcap in os.scandir(pcap_dir)
-        if pcap.is_file() and pcap.path.endswith('pcap')]
+        if pcap.is_file() and pcap.path.endswith(pcap_suffix)]
     for pcap_filename in pap_filenames:
         try:
             pcap_json = json.loads(
@@ -53,9 +54,10 @@ def proto_annotate_pcaps(pcap_dir):
             if len(packet_layers) > len(pcap_layers):
                 pcap_layers = packet_layers
         pcap_basename = os.path.basename(pcap_filename)
+        pcap_basename.replace(pcap_suffix, '')
         layers_str = '-'.join(pcap_layers)
         layers_pcap_filename = pcap_filename.replace(
-            pcap_basename, '-'.join((layers_str, pcap_basename)))
+            pcap_basename, '-'.join((pcap_basename, layers_str)))
         os.rename(pcap_filename, layers_pcap_filename)
 
 def connect_rabbit(host='messenger', port=5672, queue='task_queue'):
