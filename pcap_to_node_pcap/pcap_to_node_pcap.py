@@ -100,37 +100,31 @@ def run_tool(path, protoannotate):
 
     # need to make directories to store results from pcapsplitter
     base_dir = path.rsplit('/', 1)[0]
-    timestamp = ""
-    try:
-        timestamp = '-'.join(str(datetime.datetime.now()).split(' ')) + '-UTC'
-        timestamp = timestamp.replace(':', '_')
-    except Exception as e:  # pragma: no cover
-        print("couldn't create output directory with unique timestamp")
+    timestamp = '-'.join(str(datetime.datetime.now()).split(' ')) + '-UTC'
+    timestamp = timestamp.replace(':', '_')
     # make directory for tool name recognition of piping to other tools
     output_dir = os.path.join(base_dir, 'pcap-node-splitter' + '-' + timestamp)
-    try:
-        os.mkdir(output_dir)
-        os.mkdir(output_dir + '/clients')
-        os.mkdir(output_dir + '/servers')
-    except OSError:  # pragma: no cover
-        print("couldn't make directories for output of this tool")
     clients_dir = os.path.join(output_dir, 'clients')
     servers_dir = os.path.join(output_dir, 'servers')
+    for new_dir in (output_dir, clients_dir, servers_dir):
+        try:
+            os.mkdir(new_dir)
+        except OSError as err:
+            print("couldn't make directory %s for output of this tool" % new_dir)
 
-    try:
-        subprocess.check_call(shlex.split("./PcapSplitter -f " +
-                                          path + " -o " + clients_dir + " -m client-ip"))
-
-        subprocess.check_call(shlex.split("./PcapSplitter -f " +
-                                          path + " -o " + servers_dir + " -m server-ip"))
-    except Exception as e:
-        print(str(e))
+    for tool_cmd in (
+            "./PcapSplitter -f " + path + " -o " + clients_dir + " -m client-ip",
+            "./PcapSplitter -f " + path + " -o " + servers_dir + " -m server-ip"):
+        try:
+            subprocess.check_call(shlex.split(tool_cmd))
+        except Exception as err:
+            print("%s: %s" % (tool_cmd, err))
 
     if protoannotate:
         for pcap_dir in (clients_dir, servers_dir):
             proto_annotate_pcaps(pcap_dir)
 
-    return output_dir + '/clients'
+    return clients_dir
 
 if __name__ == '__main__':  # pragma: no cover
     parser = argparse.ArgumentParser()
