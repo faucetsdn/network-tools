@@ -53,14 +53,14 @@ def run_tool(path):
     alerts = ''
     try:
         output = subprocess.check_output(shlex.split("snort -c /etc/snort/etc/snort.conf -r " +
-                                         path), stderr=subprocess.STDOUT)
-        alerts = subprocess.check_output(shlex.split("cat /var/log/snort/alert"))
+                                         path), stderr=subprocess.STDOUT).decode("utf-8")
+        alerts = subprocess.check_output(shlex.split("cat /var/log/snort/alert")).decode("utf-8")
     except Exception as e:
         print(str(e))
 
     print(output)
     print(alerts)
-    return str(output), str(alerts)
+    return output, alerts
 
 if __name__ == '__main__':  # pragma: no cover
     path = get_path()
