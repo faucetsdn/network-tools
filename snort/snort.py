@@ -48,6 +48,44 @@ def get_path():
         print("No path provided: {0}, quitting".format(str(e)))
     return path
 
+def parse_snort(output):
+    lines = output.split('\n')
+    keep_lines = False
+    good_lines = []
+    for line in lines:
+        if line.startswith('Commencing packet processing'):
+            keep_lines = True
+            continue
+        if keep_lines:
+            good_lines.append(line)
+
+    groups = {}
+    i = 0
+    title = None
+    # remove last two lines for 'snort exiting'
+    while i < len(good_lines)-2:
+        if good_lines[i].startswith('==='):
+            if (good_lines[i+1].startswith('===') or
+                good_lines[i+1].startswith('Snort exiting') or
+                good_lines[i+1].startswith('Run time for packet') or
+                good_lines[i+1].startswith('Memory usage summary') or
+                good_lines[i+1].startswith('Packet I/O Totals')):
+                i += 1
+                continue
+            title = good_lines[i+1].strip()
+            groups[title] = []
+            i += 2
+            continue
+        if title:
+            groups[title].append(good_lines[i])
+        i += 1
+
+    return groups
+
+def parse_alerts(alerts):
+    alerts = alerts.split('\n\n')
+    return {'Alerts': alerts}
+
 def run_tool(path):
     output = ''
     alerts = ''
@@ -58,6 +96,8 @@ def run_tool(path):
     except Exception as e:
         print(str(e))
 
+    output = parse_snort(output)
+    alerts = parse_alerts(alerts)
     print(output)
     print(alerts)
     return output, alerts
