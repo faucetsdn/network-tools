@@ -28,9 +28,14 @@ def ipaddress_fields(json_fields):
     return ipas
 
 def proto_annotate_pcaps(pcap_dir):
-    pap_filenames = [
-        pcap.path for pcap in os.scandir(pcap_dir)
-        if pcap.is_file() and pcap.path.endswith('pcap')]
+    pcap_suffix = '.pcap'
+    try:
+        pap_filenames = [
+            pcap.path for pcap in os.scandir(pcap_dir)
+            if pcap.is_file() and pcap.path.endswith(pcap_suffix)]
+    except FileNotFoundError as err:
+        print(err)
+        return
     for pcap_filename in pap_filenames:
         try:
             response = subprocess.check_output(shlex.split(' '.join(
@@ -53,9 +58,10 @@ def proto_annotate_pcaps(pcap_dir):
             if len(packet_layers) > len(pcap_layers):
                 pcap_layers = packet_layers
         pcap_basename = os.path.basename(pcap_filename)
+        pcap_basename.replace(pcap_suffix, '')
         layers_str = '-'.join(pcap_layers)
         layers_pcap_filename = pcap_filename.replace(
-            pcap_basename, '-'.join((layers_str, pcap_basename)))
+            pcap_basename, '-'.join((pcap_basename, layers_str)))
         os.rename(pcap_filename, layers_pcap_filename)
 
 def connect_rabbit(host='messenger', port=5672, queue='task_queue'):
@@ -98,46 +104,41 @@ def run_tool(path, protoannotate):
 
     # need to make directories to store results from pcapsplitter
     base_dir = path.rsplit('/', 1)[0]
-    timestamp = ""
-    try:
-        timestamp = '-'.join(str(datetime.datetime.now()).split(' ')) + '-UTC'
-        timestamp = timestamp.replace(':', '_')
-    except Exception as e:  # pragma: no cover
-        print("couldn't create output directory with unique timestamp")
+    timestamp = '-'.join(str(datetime.datetime.now()).split(' ')) + '-UTC'
+    timestamp = timestamp.replace(':', '_')
     # make directory for tool name recognition of piping to other tools
     output_dir = os.path.join(base_dir, 'pcap-node-splitter' + '-' + timestamp)
-    try:
-        os.mkdir(output_dir)
-        os.mkdir(output_dir + '/clients')
-        os.mkdir(output_dir + '/servers')
-    except OSError:  # pragma: no cover
-        print("couldn't make directories for output of this tool")
     clients_dir = os.path.join(output_dir, 'clients')
     servers_dir = os.path.join(output_dir, 'servers')
+    for new_dir in (output_dir, clients_dir, servers_dir):
+        try:
+            os.mkdir(new_dir)
+        except OSError as err:
+            print("couldn't make directory %s for output of this tool: %s" % (new_dir, err))
 
-    try:
-        subprocess.check_call(shlex.split("./PcapSplitter -f " +
-                                          path + " -o " + clients_dir + " -m client-ip"))
-
-        subprocess.check_call(shlex.split("./PcapSplitter -f " +
-                                          path + " -o " + servers_dir + " -m server-ip"))
-    except Exception as e:
-        print(str(e))
+    for tool_cmd in (
+            "./PcapSplitter -f " + path + " -o " + clients_dir + " -m client-ip",
+            "./PcapSplitter -f " + path + " -o " + servers_dir + " -m server-ip"):
+        try:
+            subprocess.check_call(shlex.split(tool_cmd))
+        except Exception as err:
+            print("%s: %s" % (tool_cmd, err))
 
     if protoannotate:
         for pcap_dir in (clients_dir, servers_dir):
             proto_annotate_pcaps(pcap_dir)
 
-    return output_dir + '/clients'
+    return clients_dir
 
 if __name__ == '__main__':  # pragma: no cover
     parser = argparse.ArgumentParser()
-    parser.add_argument('--protoannotate', help='use tshark to annotate pcaps with protocol', action='store_true')
+    parser.add_argument('--protoannotate', help='use tshark to annotate pcaps with protocol',
+        action='store_true', default=True)
     parser.add_argument('paths', nargs='*')
     args = parser.parse_args()
     path = get_path(args.paths)
     if path:
-        result_path = run_tool(path, args.protoannotate)
+        result_path = run_tool(path, True)
     uid = ''
     if 'id' in os.environ:
         uid = os.environ['id']
