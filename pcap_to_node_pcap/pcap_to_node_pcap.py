@@ -96,7 +96,7 @@ def get_version():
 def get_path(paths):
     path = None
     try:
-        path = paths[0]
+        path = shlex.split(paths[0])[0]
     except Exception as e:
         print("No path provided: {0}, quitting".format(str(e)))
     return path
@@ -120,11 +120,10 @@ def run_tool(path, protoannotate):
         except OSError as err:
             print("couldn't make directory %s for output of this tool: %s" % (new_dir, err))
 
+        split_args = ['./PcapSplitter', '-f', path, '-o']
         try:
-            subprocess.check_call(
-                shlex.split("./PcapSplitter -f " + path + " -o " + clients_dir + " -m client-ip"))
-            subprocess.check_call(
-                shlex.split("./PcapSplitter -f " + path + " -o " + servers_dir + " -m server-ip"))
+            subprocess.check_call(split_args + [clients_dir, '-m',  'client-ip'])
+            subprocess.check_call(split_args + [servers_dir, '-m',  'server-ip'])
         except Exception as err:
             print(str(err))
 
