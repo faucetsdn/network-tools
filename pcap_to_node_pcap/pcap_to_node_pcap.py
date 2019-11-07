@@ -121,10 +121,10 @@ def run_tool(path, protoannotate):
             print("couldn't make directory %s for output of this tool: %s" % (new_dir, err))
 
     for tool_cmd in (
-            "./PcapSplitter -f " + path + " -o " + clients_dir + " -m client-ip",
-            "./PcapSplitter -f " + path + " -o " + servers_dir + " -m server-ip"):
+            shlex.split("./PcapSplitter -f " + path + " -o " + clients_dir + " -m client-ip"),
+            shlex.split("./PcapSplitter -f " + path + " -o " + servers_dir + " -m server-ip")):
         try:
-            subprocess.check_call(shlex.split(tool_cmd))
+            subprocess.check_call(tool_cmd)
         except Exception as err:
             print("%s: %s" % (tool_cmd, err))
 
