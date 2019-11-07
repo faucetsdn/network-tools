@@ -134,15 +134,20 @@ def run_tool(path, protoannotate):
 
     return clients_dir
 
-if __name__ == '__main__':  # pragma: no cover
+def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--protoannotate', help='use tshark to annotate pcaps with protocol',
         action='store_true', default=True)
     parser.add_argument('paths', nargs='*')
     args = parser.parse_args()
+    return args
+
+
+if __name__ == '__main__':  # pragma: no cover
+    args = parse_args()
     path = get_path(args.paths)
     if path:
-        result_path = run_tool(path, True)
+        result_path = run_tool(path, args.protoannotate)
     uid = ''
     if 'id' in os.environ:
         uid = os.environ['id']

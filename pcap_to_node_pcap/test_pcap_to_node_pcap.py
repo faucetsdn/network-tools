@@ -6,7 +6,7 @@ Created on 20 December 2018
 """
 import sys
 
-from .pcap_to_node_pcap import get_path, run_tool, pcap_name_with_layers
+from .pcap_to_node_pcap import get_path, run_tool, pcap_name_with_layers, parse_args
 
 
 def test_pcap_name_with_layers():
@@ -15,6 +15,10 @@ def test_pcap_name_with_layers():
     pcap_filename = pcap_basename + pcap_suffix
     new_name = pcap_name_with_layers(pcap_filename, ['a', 'b', 'c'], pcap_suffix)
     assert new_name == pcap_basename + '-a-b-c' + pcap_suffix
+
+def test_parse_args():
+    args = parse_args()
+    assert args.protoannotate
 
 
 def test_get_path():
