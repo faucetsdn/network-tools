@@ -4,6 +4,7 @@ Test module for pcap_to_node_pcap.py
 Created on 20 December 2018
 @author: Charlie Lewis
 """
+import argparse
 import sys
 
 from .pcap_to_node_pcap import get_path, run_tool, pcap_name_with_layers, parse_args
@@ -17,7 +18,7 @@ def test_pcap_name_with_layers():
     assert new_name == pcap_basename + '-a-b-c' + pcap_suffix
 
 def test_parse_args():
-    args = parse_args()
+    args = parse_args(argparse.ArgumentParser([]))
     assert args.protoannotate
 
 

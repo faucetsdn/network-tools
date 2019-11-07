@@ -134,8 +134,7 @@ def run_tool(path, protoannotate):
 
     return clients_dir
 
-def parse_args():
-    parser = argparse.ArgumentParser()
+def parse_args(parser):
     parser.add_argument('--protoannotate', help='use tshark to annotate pcaps with protocol',
         action='store_true', default=True)
     parser.add_argument('paths', nargs='*')
@@ -144,7 +143,7 @@ def parse_args():
 
 
 if __name__ == '__main__':  # pragma: no cover
-    args = parse_args()
+    args = parse_args(argparse.ArgumentParser())
     path = get_path(args.paths)
     if path:
         result_path = run_tool(path, args.protoannotate)
