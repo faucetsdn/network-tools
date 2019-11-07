@@ -29,9 +29,13 @@ def ipaddress_fields(json_fields):
 
 def proto_annotate_pcaps(pcap_dir):
     pcap_suffix = '.pcap'
-    pap_filenames = [
-        pcap.path for pcap in os.scandir(pcap_dir)
-        if pcap.is_file() and pcap.path.endswith(pcap_suffix)]
+    try:
+        pap_filenames = [
+            pcap.path for pcap in os.scandir(pcap_dir)
+            if pcap.is_file() and pcap.path.endswith(pcap_suffix)]
+    except FileNotFoundError as err:
+        print(err)
+        return
     for pcap_filename in pap_filenames:
         try:
             response = subprocess.check_output(shlex.split(' '.join(
@@ -110,7 +114,7 @@ def run_tool(path, protoannotate):
         try:
             os.mkdir(new_dir)
         except OSError as err:
-            print("couldn't make directory %s for output of this tool" % new_dir)
+            print("couldn't make directory %s for output of this tool: %s" % (new_dir, err))
 
     for tool_cmd in (
             "./PcapSplitter -f " + path + " -o " + clients_dir + " -m client-ip",
