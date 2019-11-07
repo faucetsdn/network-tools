@@ -27,6 +27,14 @@ def ipaddress_fields(json_fields):
         ipas.add(str(ipa))
     return ipas
 
+def pcap_name_with_layers(pcap_filename, pcap_layers, pcap_suffix):
+    pcap_basename = os.path.basename(pcap_filename)
+    pcap_basename = pcap_basename.replace(pcap_suffix, '')
+    layers_str = '-'.join(pcap_layers)
+    layers_pcap_filename = pcap_filename.replace(
+        pcap_basename, '-'.join((pcap_basename, layers_str)))
+    return layers_pcap_filename
+
 def proto_annotate_pcaps(pcap_dir):
     pcap_suffix = '.pcap'
     try:
@@ -57,11 +65,7 @@ def proto_annotate_pcaps(pcap_dir):
             packet_layers = list(ipas) + list(layers_json.keys())
             if len(packet_layers) > len(pcap_layers):
                 pcap_layers = packet_layers
-        pcap_basename = os.path.basename(pcap_filename)
-        pcap_basename.replace(pcap_suffix, '')
-        layers_str = '-'.join(pcap_layers)
-        layers_pcap_filename = pcap_filename.replace(
-            pcap_basename, '-'.join((pcap_basename, layers_str)))
+        layers_pcap_filename = pcap_name_with_layers(pcap_filename, pcap_layers, pcap_suffix)
         os.rename(pcap_filename, layers_pcap_filename)
 
 def connect_rabbit(host='messenger', port=5672, queue='task_queue'):
