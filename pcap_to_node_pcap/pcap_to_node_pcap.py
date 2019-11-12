@@ -49,7 +49,7 @@ def proto_annotate_pcaps(pcap_dir):
     for pcap_filename in pap_filenames:
         try:
             response = subprocess.check_output(shlex.split(' '.join( # nosec
-                    ['./tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename])))
+                ['./tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename])))
             pcap_json = json.loads(response.decode("utf-8"))
         except (json.decoder.JSONDecodeError, subprocess.CalledProcessError) as e:
             print(pcap_filename, str(e))
@@ -61,7 +61,7 @@ def proto_annotate_pcaps(pcap_dir):
             except KeyError:
                 continue
             ipas = set()
-            for field in ('ip', 'ip6', 'arp'):
+            for field in ('ip', 'ipv6', 'arp'):
                 if field in layers_json:
                     ipas = ipas.union(ipaddress_fields(layers_json[field]))
             packet_layers = list(ipas) + list(layers_json.keys())
@@ -81,12 +81,9 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
     channel.basic_publish(exchange=exchange,
                           routing_key=routing_key,
                           body=json.dumps(msg),
-                          properties=pika.BasicProperties(
-                          delivery_mode=2,
-                         ))
+                          properties=pika.BasicProperties(delivery_mode=2,))
     print(" [X] %s UTC %r %r" % (str(datetime.datetime.utcnow()),
                                  str(msg['id']), str(msg['file_path'])))
-    return
 
 def get_version():
     version = ''
@@ -105,8 +102,8 @@ def get_path(paths):
 
 def run_tool(path, protoannotate):
     if os.path.getsize(path) < 100:
-       print("pcap file too small, not splitting")
-       return
+        print("pcap file too small, not splitting")
+        return None
 
     # need to make directories to store results from pcapsplitter
     base_dir = path.rsplit('/', 1)[0]
@@ -137,18 +134,21 @@ def run_tool(path, protoannotate):
     return clients_dir
 
 def parse_args(parser):
-    parser.add_argument('--protoannotate', help='use tshark to annotate pcaps with protocol',
-        action='store_true', default=True)
+    parser.add_argument(
+        '--protoannotate',
+        help='use tshark to annotate pcaps with protocol',
+        action='store_true',
+        default=True)
     parser.add_argument('paths', nargs='*')
-    args = parser.parse_args()
-    return args
+    parsed_args = parser.parse_args()
+    return parsed_args
 
 
 if __name__ == '__main__':  # pragma: no cover
-    args = parse_args(argparse.ArgumentParser())
-    path = get_path(args.paths)
+    parsed_args = parse_args(argparse.ArgumentParser())
+    path = get_path(parsed_args.paths)
     if path:
-        result_path = run_tool(path, args.protoannotate)
+        result_path = run_tool(path, parsed_args.protoannotate)
     uid = ''
     if 'id' in os.environ:
         uid = os.environ['id']
