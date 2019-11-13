@@ -21,6 +21,18 @@ import tempfile
 
 import pika
 
+
+def parse_layer_ports(json_fields):
+    ports = set()
+    for field, content in json_fields.items():
+        if field.endswith('port'):
+            try:
+                port = int(content)
+                ports.add(port)
+            except ValueError:
+                continue
+    return ports
+
 def ipaddress_fields(json_fields):
     ipas = set()
     for _, content in sorted(json_fields.items()):
@@ -50,10 +62,16 @@ def parse_pcap_json_to_layers(pcap_json):
         except KeyError:
             continue
         ipas = set()
-        for field in ('ip', 'ipv6', 'arp'):
+        ports = set()
+        for field in ('ip', 'ipv6', 'arp', 'tcp', 'udp'):
             if field in layers_json:
-                ipas = ipas.union(ipaddress_fields(layers_json[field]))
-        packet_layers = list(ipas) + list(layers_json.keys())
+                json_fields = layers_json[field]
+                ipas = ipas.union(ipaddress_fields(json_fields))
+                ports = ports.union(parse_layer_ports(json_fields))
+        lowest_port = []
+        if ports:
+            lowest_port = ['port-%u' % min(ports)]
+        packet_layers = list(sorted(ipas)) + list(layers_json.keys()) + lowest_port
         if len(packet_layers) > len(pcap_layers):
             pcap_layers = packet_layers
     return pcap_layers

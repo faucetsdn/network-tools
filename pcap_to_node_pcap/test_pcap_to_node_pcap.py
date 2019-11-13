@@ -21,7 +21,7 @@ def test_parse_pcap_json():
                     "ip.src_host": "192.168.254.254",
                     "ip.dst": "192.168.254.4",
                     "ip.dst_host": "192.168.254.4",
-                    "ip.host": "192.168.254.4"
+                    "ip.host": "192.168.254.4",
                 },
                 "tcp": {
                     "tcp.srcport": "42628",
@@ -31,7 +31,7 @@ def test_parse_pcap_json():
         }
     }]
     layers = parse_pcap_json_to_layers(test_pcap_json)
-    assert layers == ['192-168-254-254', '192-168-254-4', 'frame', 'eth', 'ip', 'tcp']
+    assert layers == ['192-168-254-254', '192-168-254-4', 'frame', 'eth', 'ip', 'tcp', 'port-9100']
 
 
 def test_ipaddress_fields():
