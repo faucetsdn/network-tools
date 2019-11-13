@@ -17,6 +17,7 @@ def test_pcap_name_with_layers():
     new_name = pcap_name_with_layers(pcap_filename, ['a', 'b', 'c'], pcap_suffix)
     assert new_name == pcap_basename + '-a-b-c' + pcap_suffix
 
+
 def test_parse_args():
     args = parse_args(argparse.ArgumentParser([]))
     assert args.protoannotate

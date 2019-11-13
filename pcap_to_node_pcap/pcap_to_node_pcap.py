@@ -13,26 +13,31 @@ import datetime
 import ipaddress
 import json
 import os
+import re
 import shlex
+import shutil
 import subprocess
+import tempfile
 
 import pika
-
 
 def ipaddress_fields(json_fields):
     ipas = set()
     for _, content in sorted(json_fields.items()):
         try:
-            ipa = ipaddress.ip_address(content)
+            ipa = str(ipaddress.ip_address(content))
+            ipa = re.sub(r'[^0-9]+', '-', ipa)
         except ValueError:
             continue
-        ipas.add(str(ipa))
+        ipas.add(ipa)
     return ipas
 
 def pcap_name_with_layers(pcap_filename, pcap_layers, pcap_suffix):
     pcap_basename = os.path.basename(pcap_filename)
     pcap_basename = pcap_basename.replace(pcap_suffix, '')
-    layers_str = '-'.join(pcap_layers)
+    safe_pcap_layers = [
+        re.sub(r'[^a-zA-Z0-9\-]+', '', i) for i in pcap_layers]
+    layers_str = '-'.join(safe_pcap_layers)
     layers_pcap_filename = pcap_filename.replace(
         pcap_basename, '-'.join((pcap_basename, layers_str)))
     return layers_pcap_filename
@@ -50,7 +55,7 @@ def proto_annotate_pcaps(pcap_dir):
         try:
             response = subprocess.check_output(shlex.split(' '.join( # nosec
                 ['./tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename])))
-            pcap_json = json.loads(response.decode("utf-8"))
+            pcap_json = json.loads(response.decode('utf-8'))
         except (json.decoder.JSONDecodeError, subprocess.CalledProcessError) as e:
             print(pcap_filename, str(e))
             continue
@@ -100,6 +105,15 @@ def get_path(paths):
         print("No path provided: {0}, quitting".format(str(e)))
     return path
 
+def run_split(clients_dir, servers_dir):
+    for tool_cmd in (
+            " ".join(("./PcapSplitter -f", path, "-o", clients_dir, "-m client-ip")),
+            " ".join(("./PcapSplitter -f", path, "-o", servers_dir, "-m server-ip"))):
+        try:
+            subprocess.check_call(shlex.split(tool_cmd)) # nosec
+        except Exception as err:
+            print("%s: %s" % (tool_cmd, err))
+
 def run_tool(path, protoannotate):
     if os.path.getsize(path) < 100:
         print("pcap file too small, not splitting")
@@ -109,27 +123,29 @@ def run_tool(path, protoannotate):
     base_dir = path.rsplit('/', 1)[0]
     timestamp = '-'.join(str(datetime.datetime.now()).split(' ')) + '-UTC'
     timestamp = timestamp.replace(':', '_')
-    # make directory for tool name recognition of piping to other tools
     output_dir = os.path.join(base_dir, 'pcap-node-splitter' + '-' + timestamp)
     clients_dir = os.path.join(output_dir, 'clients')
     servers_dir = os.path.join(output_dir, 'servers')
-    for new_dir in (output_dir, clients_dir, servers_dir):
-        try:
-            os.mkdir(new_dir)
-        except OSError as err:
-            print("couldn't make directory %s for output of this tool: %s" % (new_dir, err))
 
-    for tool_cmd in (
-            " ".join(("./PcapSplitter -f", path, "-o", clients_dir, "-m client-ip")),
-            " ".join(("./PcapSplitter -f", path, "-o", servers_dir, "-m server-ip"))):
-        try:
-            subprocess.check_call(shlex.split(tool_cmd)) # nosec
-        except Exception as err:
-            print("%s: %s" % (tool_cmd, err))
-
-    if protoannotate:
-        for pcap_dir in (clients_dir, servers_dir):
-            proto_annotate_pcaps(pcap_dir)
+    try:
+        os.mkdir(output_dir)
+        # Ensure file_drop doesn't see pcap before annotation..
+        if protoannotate:
+            tmp_clients_dir = tempfile.mkdtemp()
+            tmp_servers_dir = tempfile.mkdtemp()
+            run_split(tmp_clients_dir, tmp_servers_dir)
+            for tmp_dir, final_dir in (
+                    (tmp_clients_dir, clients_dir),
+                    (tmp_servers_dir, servers_dir)):
+                proto_annotate_pcaps(tmp_dir)
+                shutil.copytree(tmp_dir, final_dir)
+                shutil.rmtree(tmp_dir)
+        else:
+            for new_dir in (clients_dir, servers_dir):
+                os.mkdir(new_dir)
+            run_split(clients_dir, servers_dir)
+    except Exception as err:
+        print(err)
 
     return clients_dir
 
@@ -152,10 +168,11 @@ if __name__ == '__main__':  # pragma: no cover
     uid = ''
     if 'id' in os.environ:
         uid = os.environ['id']
-    if 'rabbit' in os.environ and os.environ['rabbit'] == 'true':
+    if os.environ.get('rabbit', False) == 'true':
         try:
             channel = connect_rabbit()
-            body = {'id': uid, 'type': 'metadata', 'file_path': result_path, 'data': '', 'results': {'tool': 'pcap-splitter', 'version': get_version()}}
+            body = {'id': uid, 'type': 'metadata', 'file_path': result_path, 'data': '',
+                    'results': {'tool': 'pcap-splitter', 'version': get_version()}}
             send_rabbit_msg(body, channel)
         except Exception as e:
             print(str(e))
