@@ -105,10 +105,10 @@ def get_path(paths):
         print("No path provided: {0}, quitting".format(str(e)))
     return path
 
-def run_split(clients_dir, servers_dir):
+def run_split(in_path, clients_dir, servers_dir):
     for tool_cmd in (
-            " ".join(("./PcapSplitter -f", path, "-o", clients_dir, "-m client-ip")),
-            " ".join(("./PcapSplitter -f", path, "-o", servers_dir, "-m server-ip"))):
+            " ".join(("./PcapSplitter -f", in_path, "-o", clients_dir, "-m client-ip")),
+            " ".join(("./PcapSplitter -f", in_path, "-o", servers_dir, "-m server-ip"))):
         try:
             subprocess.check_call(shlex.split(tool_cmd)) # nosec
         except Exception as err:
@@ -133,7 +133,7 @@ def run_tool(path, protoannotate):
         if protoannotate:
             tmp_clients_dir = tempfile.mkdtemp()
             tmp_servers_dir = tempfile.mkdtemp()
-            run_split(tmp_clients_dir, tmp_servers_dir)
+            run_split(path, tmp_clients_dir, tmp_servers_dir)
             for tmp_dir, final_dir in (
                     (tmp_clients_dir, clients_dir),
                     (tmp_servers_dir, servers_dir)):
@@ -143,7 +143,7 @@ def run_tool(path, protoannotate):
         else:
             for new_dir in (clients_dir, servers_dir):
                 os.mkdir(new_dir)
-            run_split(clients_dir, servers_dir)
+            run_split(path, clients_dir, servers_dir)
     except Exception as err:
         print(err)
 
