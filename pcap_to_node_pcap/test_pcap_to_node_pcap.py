@@ -5,9 +5,33 @@ Created on 20 December 2018
 @author: Charlie Lewis
 """
 import argparse
-import sys
 
-from .pcap_to_node_pcap import get_path, ipaddress_fields, run_tool, pcap_name_with_layers, parse_args
+from .pcap_to_node_pcap import get_path, ipaddress_fields, run_tool, parse_pcap_json_to_layers, pcap_name_with_layers, parse_args
+
+
+def test_parse_pcap_json():
+    test_pcap_json = [{
+        "_source": {
+            "layers": {
+                "frame": {},
+                "eth": {"eth.type": "0x00000800"},
+                "ip": {
+                    "ip.src": "192.168.254.254",
+                    "ip.addr": "192.168.254.254",
+                    "ip.src_host": "192.168.254.254",
+                    "ip.dst": "192.168.254.4",
+                    "ip.dst_host": "192.168.254.4",
+                    "ip.host": "192.168.254.4",
+                },
+                "tcp": {
+                    "tcp.srcport": "42628",
+                    "tcp.dstport": "9100",
+                }
+            }
+        }
+    }]
+    layers = parse_pcap_json_to_layers(test_pcap_json)
+    assert layers == ['192-168-254-254', '192-168-254-4', 'frame', 'eth', 'ip', 'tcp', 'port-9100']
 
 
 def test_ipaddress_fields():
