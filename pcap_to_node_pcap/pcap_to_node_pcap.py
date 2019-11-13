@@ -42,6 +42,22 @@ def pcap_name_with_layers(pcap_filename, pcap_layers, pcap_suffix):
         pcap_basename, '-'.join((pcap_basename, layers_str)))
     return layers_pcap_filename
 
+def parse_pcap_json_to_layers(pcap_json):
+    pcap_layers = []
+    for packet_json in pcap_json:
+        try:
+            layers_json = packet_json['_source']['layers']
+        except KeyError:
+            continue
+        ipas = set()
+        for field in ('ip', 'ipv6', 'arp'):
+            if field in layers_json:
+                ipas = ipas.union(ipaddress_fields(layers_json[field]))
+        packet_layers = list(ipas) + list(layers_json.keys())
+        if len(packet_layers) > len(pcap_layers):
+            pcap_layers = packet_layers
+    return pcap_layers
+
 def proto_annotate_pcaps(pcap_dir):
     pcap_suffix = '.pcap'
     try:
@@ -59,19 +75,7 @@ def proto_annotate_pcaps(pcap_dir):
         except (json.decoder.JSONDecodeError, subprocess.CalledProcessError) as e:
             print(pcap_filename, str(e))
             continue
-        pcap_layers = []
-        for packet_json in pcap_json:
-            try:
-                layers_json = packet_json['_source']['layers']
-            except KeyError:
-                continue
-            ipas = set()
-            for field in ('ip', 'ipv6', 'arp'):
-                if field in layers_json:
-                    ipas = ipas.union(ipaddress_fields(layers_json[field]))
-            packet_layers = list(ipas) + list(layers_json.keys())
-            if len(packet_layers) > len(pcap_layers):
-                pcap_layers = packet_layers
+        pcap_layers = parse_pcap_json_to_layers(pcap_json)
         layers_pcap_filename = pcap_name_with_layers(pcap_filename, pcap_layers, pcap_suffix)
         os.rename(pcap_filename, layers_pcap_filename)
 
