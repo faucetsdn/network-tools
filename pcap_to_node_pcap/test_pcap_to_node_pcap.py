@@ -7,7 +7,12 @@ Created on 20 December 2018
 import argparse
 import sys
 
-from .pcap_to_node_pcap import get_path, run_tool, pcap_name_with_layers, parse_args
+from .pcap_to_node_pcap import get_path, ipaddress_fields, run_tool, pcap_name_with_layers, parse_args
+
+
+def test_ipaddress_fields():
+    ipas = ipaddress_fields({'field': '192.168.1.1'})
+    assert ipas == {'192-168-1-1'}
 
 
 def test_pcap_name_with_layers():
