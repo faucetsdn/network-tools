@@ -112,24 +112,24 @@ def main():
         run_p0f(path)
         run_tshark(path)
         results = parse_output()
-    print(results)
+        print(results)
 
-    if 'redis' in os.environ and os.environ['redis'] == 'true':
-        r = connect()
-        save(r, results)
+        if 'redis' in os.environ and os.environ['redis'] == 'true':
+            r = connect()
+            save(r, results)
 
-    uid = ''
-    if 'id' in os.environ:
-        uid = os.environ['id']
-    if 'rabbit' in os.environ and os.environ['rabbit'] == 'true':
-        try:
-            channel = connect_rabbit()
-            body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'p0f', 'version': get_version()}}
-            send_rabbit_msg(body, channel)
-            body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'p0f', 'version': get_version()}}
-            send_rabbit_msg(body, channel)
-        except Exception as e:
-            print(str(e))
+        uid = ''
+        if 'id' in os.environ:
+            uid = os.environ['id']
+        if 'rabbit' in os.environ and os.environ['rabbit'] == 'true':
+            try:
+                channel = connect_rabbit()
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'p0f', 'version': get_version()}}
+                send_rabbit_msg(body, channel)
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'p0f', 'version': get_version()}}
+                send_rabbit_msg(body, channel)
+            except Exception as e:
+                print(str(e))
     return
 
 if __name__ == "__main__":  # pragma: no cover
