@@ -108,7 +108,7 @@ def main():
     else:
         pcap_paths.append(path)
 
-    for path in pcap_paths:
+    for index, path in enumerate(pcap_paths):
         run_p0f(path)
         run_tshark(path)
         results = parse_output()
@@ -126,8 +126,9 @@ def main():
                 channel = connect_rabbit()
                 body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'p0f', 'version': get_version()}}
                 send_rabbit_msg(body, channel)
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'p0f', 'version': get_version()}}
-                send_rabbit_msg(body, channel)
+                if index+1 == len(pcap_paths):
+                    body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'p0f', 'version': get_version()}}
+                    send_rabbit_msg(body, channel)
             except Exception as e:
                 print(str(e))
     return
