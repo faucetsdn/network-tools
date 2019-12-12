@@ -273,12 +273,12 @@ if __name__ == '__main__':  # pragma: no cover
             try:
                 channel = connect_rabbit()
                 capinfos_results = run_capinfos(path)
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': capinfos_results, 'results': {'tool': 'pcap_stats', 'version': get_version()}}
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': capinfos_results, 'results': {'tool': 'pcap-stats', 'version': get_version()}}
                 send_rabbit_msg(body, channel)
                 tshark_results = run_tshark(path)
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': tshark_results, 'results': {'tool': 'pcap_stats', 'version': get_version()}}
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': tshark_results, 'results': {'tool': 'pcap-stats', 'version': get_version()}}
                 send_rabbit_msg(body, channel)
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'pcap_stats', 'version': get_version()}}
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'pcap-stats', 'version': get_version()}}
                 send_rabbit_msg(body, channel)
             except Exception as e:
                 print(str(e))
