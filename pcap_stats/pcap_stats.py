@@ -92,6 +92,19 @@ def run_capinfos(path):
     results = parse_capinfos(output)
     return results
 
+def get_ether_vendor(mac, lookup_path='nmap-mac-prefixes.txt'):
+    """
+    Takes a MAC address and looks up and returns the vendor for it.
+    """
+    mac = ''.join(mac.split(':'))[:6].upper()
+    try:
+        with open(lookup_path, 'r') as f:
+            for line in f:
+                if line.startswith(mac):
+                    return line.split()[1].strip()
+    except Exception as e:  # pragma: no cover
+        return 'Unknown'
+
 def parse_tshark(output):
     results = {'tshark':{}}
     in_block = False
@@ -123,7 +136,11 @@ def parse_tshark(output):
                     continue
                 else:
                     src, _, dst, frames_l, bytes_l, frames_r, bytes_r, frames_total, bytes_total, rel_start, duration = line.split()
-                    conversations.append({'Source': src, 'Destination': dst, 'Frames to Source': frames_l, 'Bytes to Source': bytes_l, 'Frames to Destination': frames_r, 'Bytes to Destination': bytes_r, 'Total Frames': frames_total, 'Total Bytes': bytes_total, 'Relative Start': rel_start, 'Duration': duration})
+                    conv = {'Source': src, 'Destination': dst, 'Frames to Source': frames_l, 'Bytes to Source': bytes_l, 'Frames to Destination': frames_r, 'Bytes to Destination': bytes_r, 'Total Frames': frames_total, 'Total Bytes': bytes_total, 'Relative Start': rel_start, 'Duration': duration}
+                    if 'Ethernet' in result:
+                        conv['Source Vendor'] = get_ether_vendor(src)
+                        conv['Destination Vendor'] = get_ether_vendor(dst)
+                    conversations.append(conv)
             results['tshark'][result] = conversations
         elif 'Endpoints' in result:
             # handle endpoint parsing
@@ -136,10 +153,16 @@ def parse_tshark(output):
                     # handle endpoint services with ports
                     if result.startswith('UDP') or result.startswith('TCP') or result.startswith('STCP'):
                         endpoint, port, packet_count, byte_count, tx_packets, tx_bytes, rx_packets, rx_bytes = line.split()
-                        endpoints.append({'Endpoint': endpoint, 'Port': port, 'Packets': packet_count, 'Bytes': byte_count, 'Tx Packets': tx_packets, 'Tx Bytes': tx_bytes, 'Rx Packets': rx_packets, 'Rx Bytes': rx_bytes})
+                        conv = {'Endpoint': endpoint, 'Port': port, 'Packets': packet_count, 'Bytes': byte_count, 'Tx Packets': tx_packets, 'Tx Bytes': tx_bytes, 'Rx Packets': rx_packets, 'Rx Bytes': rx_bytes}
+                        if 'Ethernet' in result:
+                            conv['Endpoint Vendor'] = get_ether_vendor(endpoint)
+                        endpoints.append(conv)
                     else:
                         endpoint, packet_count, byte_count, tx_packets, tx_bytes, rx_packets, rx_bytes = line.split()
-                        endpoints.append({'Endpoint': endpoint, 'Packets': packet_count, 'Bytes': byte_count, 'Tx Packets': tx_packets, 'Tx Bytes': tx_bytes, 'Rx Packets': rx_packets, 'Rx Bytes': rx_bytes})
+                        conv = {'Endpoint': endpoint, 'Packets': packet_count, 'Bytes': byte_count, 'Tx Packets': tx_packets, 'Tx Bytes': tx_bytes, 'Rx Packets': rx_packets, 'Rx Bytes': rx_bytes}
+                        if 'Ethernet' in result:
+                            conv['Endpoint Vendor'] = get_ether_vendor(endpoint)
+                        endpoints.append(conv)
             results['tshark'][result] = endpoints
         else:
             # handle weird stuff

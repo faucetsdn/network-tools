@@ -13,6 +13,7 @@ RUN apk update && \
 
 RUN pip3 install -r requirements.txt
 
+COPY nmap-mac-prefixes.txt nmap-mac-prefixes.txt
 COPY pcap_stats.py pcap_stats.py
 
 ENTRYPOINT ["python3", "pcap_stats.py"]
