@@ -32,16 +32,21 @@ def get_version():
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'VERSION'), 'r') as f:
         return f.read().strip()
 
+
+def run_proc(args):
+    proc = subprocess.Popen(args, shell=True, stdout=subprocess.DEVNULL)
+    return proc.communicate()
+
 def run_p0f(path, p0f_output):
     args = ' '.join(['/usr/bin/p0f', '-r', path, '-o', p0f_output])
-    return subprocess.run(args, shell=True)
+    return run_proc(args)
 
 def run_tshark(path, tshark_output):
     exit_status = []
     args = ' '.join(['/usr/bin/tshark', '-r', path, '-T', 'fields', '-e', 'eth.src', '-e', 'ip.src', '|', 'sort', '|', 'uniq', '>', tshark_output])
-    exit_status.append(subprocess.run(args, shell=True))
+    exit_status.append(run_proc(args))
     args = ' '.join(['/usr/bin/tshark', '-r', path, '-T', 'fields', '-e', 'ip.src', '-e', 'eth.src', '|', 'sort', '|', 'uniq', '>>', tshark_output])
-    exit_status.append(subprocess.run(args, shell=True))
+    exit_status.append(run_proc(args))
     return exit_status
 
 def parse_output(p0f_output, tshark_output):
@@ -98,16 +103,20 @@ def save(r, results):
             print('Unable to store contents of p0f: ' + str(results) +
                   ' in redis because: ' + str(e))
 
+def ispcap(pathfile):
+    for ext in ('pcap', 'pcapng', 'dump', 'capture'):
+        if pathfile.endswith(''.join(('.', ext))):
+            return True
+    return False
+
 def main():
     pcap_paths = []
     path = sys.argv[1]
     if os.path.isdir(path):
         for root, _, files in os.walk(path):
             for pathfile in files:
-                for ext in ('pcap', 'pcapng', 'dump', 'capture'):
-                    if pathfile.endswith(''.join(('.', ext))):
-                        pcap_paths.append(os.path.join(root, pathfile))
-                        break
+                if ispcap(pathfile):
+                    pcap_paths.append(os.path.join(root, pathfile))
     else:
         pcap_paths.append(path)
 

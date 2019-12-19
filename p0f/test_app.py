@@ -13,6 +13,7 @@ from .app import run_tshark
 from .app import parse_output
 from .app import connect
 from .app import get_version
+from .app import ispcap
 from .app import save
 from .app import main
 
@@ -54,6 +55,11 @@ def create_test_output(p0f_output, tshark_output):
         f.write("50.18.44.198	00:00:00:7f:52:89\n")
         f.write("69.89.207.99	00:00:00:7f:52:89\n")
         f.write("96.126.105.86	00:00:00:7f:52:89\n")
+
+
+def test_ispcap():
+    assert ispcap('afile.pcap')
+    assert not ispcap('notapcap.txt')
 
 
 def test_version():
