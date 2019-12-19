@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import time
@@ -32,11 +33,16 @@ def get_version():
         return f.read().strip()
 
 def run_p0f(path, p0f_output):
-    os.system('/usr/sbin/p0f -r ' + path + ' -o ' + p0f_output + '> /dev/null')
+    args = ' '.join(['/usr/bin/p0f', '-r', path, '-o', p0f_output])
+    return subprocess.run(args, shell=True)
 
 def run_tshark(path, tshark_output):
-    os.system('/usr/bin/tshark -r ' + path + ' -T fields -e ip.src -e eth.src | sort | uniq > ' + tshark_output)
-    os.system('/usr/bin/tshark -r ' + path + ' -T fields -e ip.dst -e eth.dst | sort | uniq >> ' + tshark_output)
+    exit_status = []
+    args = ' '.join(['/usr/bin/tshark', '-r', path, '-T', 'fields', '-e', 'eth.src', '-e', 'ip.src', '|', 'sort', '|', 'uniq', '>', tshark_output])
+    exit_status.append(subprocess.run(args, shell=True))
+    args = ' '.join(['/usr/bin/tshark', '-r', path, '-T', 'fields', '-e', 'ip.src', '-e', 'eth.src', '|', 'sort', '|', 'uniq', '>>', tshark_output])
+    exit_status.append(subprocess.run(args, shell=True))
+    return exit_status
 
 def parse_output(p0f_output, tshark_output):
     results = {}
