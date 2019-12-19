@@ -32,21 +32,20 @@ def get_version():
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'VERSION'), 'r') as f:
         return f.read().strip()
 
-
-def run_proc(args):
-    proc = subprocess.Popen(args, shell=True, stdout=subprocess.DEVNULL)
+def run_proc(args, shell=False):
+    proc = subprocess.Popen(args, shell=shell, stdout=subprocess.DEVNULL)
     return proc.communicate()
 
 def run_p0f(path, p0f_output):
-    args = ' '.join(['/usr/bin/p0f', '-r', path, '-o', p0f_output])
-    return run_proc(args)
+    args = ['/usr/sbin/p0f', '-r', path, '-o', p0f_output]
+    return run_proc(args, shell=False)
 
 def run_tshark(path, tshark_output):
     exit_status = []
     args = ' '.join(['/usr/bin/tshark', '-r', path, '-T', 'fields', '-e', 'eth.src', '-e', 'ip.src', '|', 'sort', '|', 'uniq', '>', tshark_output])
-    exit_status.append(run_proc(args))
+    exit_status.append(run_proc(args, shell=True))
     args = ' '.join(['/usr/bin/tshark', '-r', path, '-T', 'fields', '-e', 'ip.src', '-e', 'eth.src', '|', 'sort', '|', 'uniq', '>>', tshark_output])
-    exit_status.append(run_proc(args))
+    exit_status.append(run_proc(args, shell=True))
     return exit_status
 
 def parse_output(p0f_output, tshark_output):
