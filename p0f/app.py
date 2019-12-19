@@ -28,7 +28,7 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
     return
 
 def get_version():
-    with open('VERSION', 'r') as f:
+    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'VERSION'), 'r') as f:
         return f.read().strip()
 
 def run_p0f(path, p0f_output):
