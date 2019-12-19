@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import sys
+import tempfile
 import time
 
 import pika
@@ -27,30 +28,25 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
     return
 
 def get_version():
-    version = ''
     with open('VERSION', 'r') as f:
-        for line in f:
-            version = line.strip()
-    return version
+        return f.read().strip()
 
-def run_p0f(path):
-    os.system('/usr/bin/p0f -r ' + path + ' -o /tmp/p0f_output.txt > /dev/null')
-    return
+def run_p0f(path, p0f_output):
+    os.system('/usr/sbin/p0f -r ' + path + ' -o ' + p0f_output + '> /dev/null')
 
-def run_tshark(path):
-    os.system('/usr/bin/tshark -r ' + path + ' -T fields -e ip.src -e eth.src | sort | uniq > /tmp/tshark_output.txt')
-    os.system('/usr/bin/tshark -r ' + path + ' -T fields -e ip.dst -e eth.dst | sort | uniq >> /tmp/tshark_output.txt')
-    return
+def run_tshark(path, tshark_output):
+    os.system('/usr/bin/tshark -r ' + path + ' -T fields -e ip.src -e eth.src | sort | uniq > ' + tshark_output)
+    os.system('/usr/bin/tshark -r ' + path + ' -T fields -e ip.dst -e eth.dst | sort | uniq >> ' + tshark_output)
 
-def parse_output():
+def parse_output(p0f_output, tshark_output):
     results = {}
-    with open('/tmp/p0f_output.txt', 'r') as f:
+    with open(p0f_output, 'r') as f:
         for line in f:
             l = " ".join(line.split()[2:])
             l = l.split('|')
             if l[0] == 'mod=syn':
                 results[l[1].split('cli=')[1].split('/')[0]] = {'full_os': l[4].split('os=')[1], 'short_os': l[4].split('os=')[1].split()[0]}
-    with open('/tmp/tshark_output.txt', 'r') as f:
+    with open(tshark_output, 'r') as f:
         for line in f:
             pair = line.split()
             if len(pair) == 2:
@@ -95,43 +91,47 @@ def save(r, results):
         except Exception as e:  # pragma: no cover
             print('Unable to store contents of p0f: ' + str(results) +
                   ' in redis because: ' + str(e))
-    return
 
 def main():
     pcap_paths = []
     path = sys.argv[1]
     if os.path.isdir(path):
-        for root, dirs, files in os.walk(path):
-            for file in files:
-                if file.endswith(".pcap") or file.endswith(".pcapng") or file.endswith(".dump") or file.endswith(".capture"):
-                    pcap_paths.append(os.path.join(root, file))
+        for root, _, files in os.walk(path):
+            for pathfile in files:
+                for ext in ('pcap', 'pcapng', 'dump', 'capture'):
+                    if pathfile.endswith(''.join(('.', ext))):
+                        pcap_paths.append(os.path.join(root, pathfile))
+                        break
     else:
         pcap_paths.append(path)
 
-    for index, path in enumerate(pcap_paths):
-        run_p0f(path)
-        run_tshark(path)
-        results = parse_output()
-        print(results)
+    with tempfile.TemporaryDirectory() as tempdir:
+        p0f_output = os.path.join(tempdir, 'p0f_output.txt')
+        tshark_output = os.path.join(tempdir, 'tshark_output.txt')
 
-        if 'redis' in os.environ and os.environ['redis'] == 'true':
-            r = connect()
-            save(r, results)
+        for path in pcap_paths:
+            run_p0f(path, p0f_output)
+            run_tshark(path, tshark_output)
+            results = parse_output(p0f_output, tshark_output)
+            print(results)
 
-        uid = ''
-        if 'id' in os.environ:
-            uid = os.environ['id']
-        if 'rabbit' in os.environ and os.environ['rabbit'] == 'true':
-            try:
-                channel = connect_rabbit()
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'p0f', 'version': get_version()}}
-                send_rabbit_msg(body, channel)
-                if index+1 == len(pcap_paths):
-                    body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'p0f', 'version': get_version()}}
+            if os.environ.get('redis', '') == 'true':
+                r = connect()
+                save(r, results)
+
+            if os.environ.get('rabbit', '') == 'true':
+                uid = os.environ.get('id', '')
+                version = get_version()
+                try:
+                    channel = connect_rabbit()
+                    body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'p0f', 'version': version}}
                     send_rabbit_msg(body, channel)
-            except Exception as e:
-                print(str(e))
-    return
+                    if path == pcap_paths[-1]:
+                        body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'p0f', 'version': version}}
+                        send_rabbit_msg(body, channel)
+                except Exception as e:
+                    print(str(e))
+
 
 if __name__ == "__main__":  # pragma: no cover
     main()
