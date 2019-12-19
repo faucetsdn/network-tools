@@ -37,7 +37,7 @@ def run_proc(args, shell=False):
     return proc.communicate()
 
 def run_p0f(path, p0f_output):
-    args = ['/usr/sbin/p0f', '-r', path, '-o', p0f_output]
+    args = ['/usr/bin/p0f', '-r', path, '-o', p0f_output]
     return run_proc(args, shell=False)
 
 def run_tshark(path, tshark_output):
