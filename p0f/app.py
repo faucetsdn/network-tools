@@ -32,23 +32,26 @@ def get_version():
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'VERSION'), 'r') as f:
         return f.read().strip()
 
-def run_proc(args, shell=False):
-    try:
-        proc = subprocess.Popen(args, shell=shell, stdout=subprocess.DEVNULL)
-        return proc.communicate()
-    except FileNotFoundError as e:
-        return e
+def run_proc(args, shell=False, output=subprocess.DEVNULL):
+    proc = subprocess.Popen(args, shell=shell, stdout=output)
+    return proc.communicate()
 
-def run_p0f(path, p0f_output):
-    args = ['/usr/bin/p0f', '-r', path, '-o', p0f_output]
+def run_p0f(path, p0f_output, p0f='/usr/bin/p0f'):
+    args = [p0f, '-r', path, '-o', p0f_output]
     return run_proc(args, shell=False)
 
-def run_tshark(path, tshark_output):
+def run_tshark(path, tshark_output, tshark='/usr/bin/tshark'):
     exit_status = []
-    args = ' '.join(['/usr/bin/tshark', '-r', path, '-T', 'fields', '-e', 'eth.src', '-e', 'ip.src', '|', 'sort', '|', 'uniq', '>', tshark_output])
-    exit_status.append(run_proc(args, shell=True))
-    args = ' '.join(['/usr/bin/tshark', '-r', path, '-T', 'fields', '-e', 'ip.src', '-e', 'eth.src', '|', 'sort', '|', 'uniq', '>>', tshark_output])
-    exit_status.append(run_proc(args, shell=True))
+    with tempfile.TemporaryDirectory() as tempdir:
+        tshark_tmp = os.path.join(tempdir, 'fields.txt')
+        with open(tshark_tmp, 'w') as output:
+            args = [tshark, '-r', path, '-T', 'fields', '-e', 'eth.src', '-e', 'ip.src']
+            exit_status.append(run_proc(args, shell=False, output=output))
+            args = [tshark, '-r', path, '-T', 'fields', '-e', 'ip.src', '-e', 'eth.src']
+            exit_status.append(run_proc(args, shell=False, output=output))
+        lines = set([line.strip() for line in open(tshark_tmp, 'r').readlines() if line])
+        text = '\n'.join([line for line in lines])
+        open(tshark_output, 'w').write(text)
     return exit_status
 
 def parse_output(p0f_output, tshark_output):
