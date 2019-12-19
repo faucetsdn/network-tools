@@ -33,8 +33,11 @@ def get_version():
         return f.read().strip()
 
 def run_proc(args, shell=False):
-    proc = subprocess.Popen(args, shell=shell, stdout=subprocess.DEVNULL)
-    return proc.communicate()
+    try:
+        proc = subprocess.Popen(args, shell=shell, stdout=subprocess.DEVNULL)
+        return proc.communicate()
+    except FileNotFoundError as e:
+        return e
 
 def run_p0f(path, p0f_output):
     args = ['/usr/bin/p0f', '-r', path, '-o', p0f_output]
