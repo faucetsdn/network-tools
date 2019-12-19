@@ -92,5 +92,8 @@ def test_save():
 
 def test_main():
     with tempfile.TemporaryDirectory() as tempdir:
-        sys.argv[1] = tempdir
+        if len(sys.argv) == 0:
+            sys.argv = [os.devnull, tempdir]
+        else:
+            sys.argv[1] = tempdir
         main()
