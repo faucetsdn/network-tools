@@ -32,13 +32,13 @@ def get_version():
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'VERSION'), 'r') as f:
         return f.read().strip()
 
-def run_proc(args, shell=False, output=subprocess.DEVNULL):
-    proc = subprocess.Popen(args, shell=shell, stdout=output)
+def run_proc(args, output=subprocess.DEVNULL):
+    proc = subprocess.Popen(args, stdout=output)
     return proc.communicate()
 
 def run_p0f(path, p0f_output, p0f='/usr/bin/p0f'):
     args = [p0f, '-r', path, '-o', p0f_output]
-    return run_proc(args, shell=False)
+    return run_proc(args)
 
 def run_tshark(path, tshark_output, tshark='/usr/bin/tshark'):
     exit_status = []
@@ -46,9 +46,9 @@ def run_tshark(path, tshark_output, tshark='/usr/bin/tshark'):
         tshark_tmp = os.path.join(tempdir, 'fields.txt')
         with open(tshark_tmp, 'w') as output:
             args = [tshark, '-r', path, '-T', 'fields', '-e', 'eth.src', '-e', 'ip.src']
-            exit_status.append(run_proc(args, shell=False, output=output))
+            exit_status.append(run_proc(args, output=output))
             args = [tshark, '-r', path, '-T', 'fields', '-e', 'ip.src', '-e', 'eth.src']
-            exit_status.append(run_proc(args, shell=False, output=output))
+            exit_status.append(run_proc(args, output=output))
         lines = set([line.strip() for line in open(tshark_tmp, 'r').readlines() if line])
         text = '\n'.join([line for line in lines])
         open(tshark_output, 'w').write(text)
