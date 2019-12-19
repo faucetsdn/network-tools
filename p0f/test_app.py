@@ -67,11 +67,11 @@ def test_version():
 
 
 def test_run_p0f():
-    print(run_p0f(os.devnull, os.devnull))
+    print(run_p0f(os.devnull, os.devnull, '/bin/true'))
 
 
 def test_run_tshark():
-    print(run_tshark(os.devnull, os.devnull))
+    print(run_tshark(os.devnull, os.devnull, '/bin/true'))
 
 
 def test_parse_output():
