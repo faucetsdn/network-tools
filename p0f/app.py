@@ -26,7 +26,6 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
                           properties=pika.BasicProperties(delivery_mode=2))
     print(" [X] %s UTC %r %r" % (str(datetime.datetime.utcnow()),
                                  str(msg['id']), str(msg['file_path'])))
-    return
 
 def get_version():
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'VERSION'), 'r') as f:
@@ -80,8 +79,10 @@ def parse_output(p0f_output, addresses):
         fields = p0f_line.split('|')
         _, mod = fields[0].rsplit(' ', 1)
         if mod == 'mod=syn':
-            mod_data = {
-                field.split('=')[0]: field.rsplit('=')[-1] for field in fields[1:]}
+            mod_data = {}
+            for field in fields[1:]:
+                k, v = field.split('=')
+                mod_data[k] = v
             subj = mod_data.get('subj', None)
             if subj:
                 try:

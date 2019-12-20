@@ -30,7 +30,7 @@ def test_version():
 
 
 def test_parse_output():
-    p0f_output =run_p0f(TEST_LO_CAP)
+    p0f_output = run_p0f(TEST_LO_CAP)
     src_addresses = run_tshark(TEST_LO_CAP)
     result = parse_output(p0f_output, src_addresses)
     assert {'127.0.0.1': {'full_os': 'Linux 2.2.x-3.x',
@@ -40,7 +40,7 @@ def test_parse_output():
 
 def test_connect():
     r = connect()
-    assert r != None
+    assert r is not None
 
 
 def test_save():
