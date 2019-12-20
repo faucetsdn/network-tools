@@ -62,17 +62,19 @@ def parse_eth(packet):
     return (src_eth_address, dst_eth_address)
 
 def run_tshark(path):
-    src_addresses = set()
+    addresses = set()
     with pyshark.FileCapture(path, use_json=True, include_raw=False, keep_packets=False,
                              custom_parameters=['-o', 'tcp.desegment_tcp_streams:false', '-n']) as cap:
         for packet in cap:
-            src_eth_address, _ = parse_eth(packet)
-            src_address, _ = parse_ip(packet)
+            src_eth_address, dst_eth_address = parse_eth(packet)
+            src_address, dst_address = parse_ip(packet)
             if src_eth_address and src_address:
-                src_addresses.add((src_address, src_eth_address))
-    return src_addresses
+                addresses.add((src_address, src_eth_address))
+            if dst_eth_address and dst_address:
+                addresses.add((dst_address, dst_eth_address))
+    return addresses
 
-def parse_output(p0f_output, src_addresses):
+def parse_output(p0f_output, addresses):
     results = {}
     for p0f_line in p0f_output.splitlines():
         fields = p0f_line.split('|')
@@ -80,18 +82,20 @@ def parse_output(p0f_output, src_addresses):
         if mod == 'mod=syn':
             mod_data = {
                 field.split('=')[0]: field.rsplit('=')[-1] for field in fields[1:]}
-            try:
-                cli = mod_data['cli'].split('/')[0]
-                cli_full_os = mod_data['os']
-                cli_short_os = cli_full_os.split(' ')[0]
-                results[cli] = {
-                    'full_os': cli_full_os,
-                    'short_os': cli_short_os}
-            except KeyError:
-                continue
-    for src_address, src_eth_address in src_addresses:
-        if src_address in results:
-            results[src_address]['mac'] = src_eth_address
+            subj = mod_data.get('subj', None)
+            if subj:
+                try:
+                    host = mod_data[subj].split('/')[0]
+                    full_os = mod_data['os']
+                    short_os = full_os.split(' ')[0]
+                    results[host] = {
+                        'full_os': full_os,
+                        'short_os': short_os}
+                except KeyError:
+                    continue
+    for address, eth_address in addresses:
+        if address in results:
+            results[address]['mac'] = eth_address
     return results
 
 def connect():
@@ -152,8 +156,8 @@ def main():
 
     for path in pcap_paths:
         p0f_output = run_p0f(path)
-        src_addresses = run_tshark(path)
-        results = parse_output(p0f_output, src_addresses)
+        addresses = run_tshark(path)
+        results = parse_output(p0f_output, addresses)
         print(results)
 
         if os.environ.get('redis', '') == 'true':
