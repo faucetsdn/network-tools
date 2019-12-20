@@ -1,15 +1,12 @@
-FROM alpine:edge
+FROM alpine:3.11
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
-
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 
 # Install packages
 RUN apk update && \
-    apk -U upgrade && \
-    apk add bash jansson libpcap procps python3 py3-pip p0f tshark && \
+    apk add bash jansson libpcap gcc libxml2-dev libxslt-dev linux-headers musl-dev procps python3 python3-dev py3-pip tshark && \
+    apk add p0f --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing && \
     rm -rf /root/* && \
     rm -rf /var/cache/apk/*
-RUN pip3 install -U pip==19.1
 
 COPY . /app
 WORKDIR /app
