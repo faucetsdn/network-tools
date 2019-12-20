@@ -8,6 +8,7 @@ addons:
     update: true
     packages:
       - p0f
+      - tshark
 install:
   - pip3 install codecov pytest-cov pytype
 jobs:
