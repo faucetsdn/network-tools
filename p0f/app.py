@@ -65,7 +65,7 @@ def parse_eth(packet):
 
 def run_tshark(path):
     addresses = set()
-    with pyshark.FileCapture(path, use_json=True, include_raw=False, keep_packets=False,
+    with pyshark.FileCapture(path, include_raw=False, keep_packets=False,
                              custom_parameters=['-o', 'tcp.desegment_tcp_streams:false', '-n']) as cap:
         for packet in cap:
             src_eth_address, dst_eth_address = parse_eth(packet)
