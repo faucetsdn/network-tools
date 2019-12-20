@@ -74,11 +74,21 @@ def run_tshark(path):
 
 def parse_output(p0f_output, src_addresses):
     results = {}
-    for line in p0f_output.splitlines():
-        l = " ".join(line.split()[2:])
-        l = l.split('|')
-        if l[0] == 'mod=syn':
-            results[l[1].split('cli=')[1].split('/')[0]] = {'full_os': l[4].split('os=')[1], 'short_os': l[4].split('os=')[1].split()[0]}
+    for p0f_line in p0f_output.splitlines():
+        fields = p0f_line.split('|')
+        _, mod = fields[0].rsplit(' ', 1)
+        if mod == 'mod=syn':
+            mod_data = {
+                field.split('=')[0]: field.rsplit('=')[-1] for field in fields[1:]}
+            try:
+                cli = mod_data['cli'].split('/')[0]
+                cli_full_os = mod_data['os']
+                cli_short_os = cli_full_os.split(' ')[0]
+                results[cli] = {
+                    'full_os': cli_full_os,
+                    'short_os': cli_short_os}
+            except KeyError:
+                continue
     for src_address, src_eth_address in src_addresses:
         if src_address in results:
             results[src_address]['mac'] = src_eth_address
