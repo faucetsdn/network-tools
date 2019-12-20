@@ -38,6 +38,9 @@ def run_proc(args, output=subprocess.DEVNULL):
 def run_p0f(path):
     with tempfile.TemporaryDirectory() as tempdir:
         p0f = shutil.which('p0f')
+        # p0f not in PATH, default to alpine location.
+        if p0f is None:
+            p0f = '/usr/bin/p0f'
         p0f_output = os.path.join(tempdir, 'p0f_output.txt')
         args = [p0f, '-r', path, '-o', p0f_output]
         run_proc(args)
