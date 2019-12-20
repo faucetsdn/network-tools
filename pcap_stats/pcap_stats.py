@@ -235,7 +235,9 @@ def parse_tshark(output):
             else:
                 h[i-1][0] += '"}' + ('}'*(prev_spaces-spaces)) + ',"'
             i += 1
-        h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"}' + ('}'*(prev_spaces-spaces))
+        prev_spaces = spaces
+        spaces = h[-1][0].count('  ')
+        h[i-1][0] = h[i-1][0].strip() + '":{"Frames": "' + h[i-1][1] + '", "Bytes": "' + h[i-1][2] + '"}' + ('}'*(prev_spaces))
 
     protocol_str = '{'
     for record in h:
