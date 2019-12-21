@@ -81,7 +81,6 @@ def parse_output(p0f_output, addresses):
     results = {}
     for p0f_line in p0f_output.splitlines():
         fields = p0f_line.split('|')
-        _, mod = fields[0].rsplit(' ', 1)
         fields_data = {}
         for field in fields[1:]:
             k, v = field.split('=', 1)
@@ -99,10 +98,10 @@ def parse_output(p0f_output, addresses):
         for host_field in ('link', 'raw_mtu'):
             host_value = fields_data.get(host_field, None)
             if host_value is not None and not host_value.startswith('?'):
-                 host_results.update({host_field: host_value})
+                host_results.update({host_field: host_value})
         if host_results:
             if host not in results:
-                 results[host] = {}
+                results[host] = {}
             results[host].update(host_results)
     for address, eth_address in addresses:
         if address in results:
@@ -180,10 +179,14 @@ def main():
             version = get_version()
             try:
                 channel = connect_rabbit()
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'p0f', 'version': version}}
+                body = {
+                    'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {
+                        'tool': 'p0f', 'version': version}}
                 send_rabbit_msg(body, channel)
                 if path == pcap_paths[-1]:
-                    body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'p0f', 'version': version}}
+                    body = {
+                        'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {
+                            'tool': 'p0f', 'version': version}}
                     send_rabbit_msg(body, channel)
             except Exception as e:
                 print(str(e))
