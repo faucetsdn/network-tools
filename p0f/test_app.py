@@ -33,9 +33,11 @@ def test_parse_output():
     p0f_output = run_p0f(TEST_LO_CAP)
     src_addresses = run_tshark(TEST_LO_CAP)
     result = parse_output(p0f_output, src_addresses)
-    assert {'127.0.0.1': {'full_os': 'Linux 2.2.x-3.x',
-                          'mac': '00:00:00:00:00:00',
-                          'short_os': 'Linux'}} == result
+    assert {
+        '127.0.0.1': {
+            'full_os': 'Linux 2.2.x-3.x', 'short_os': 'Linux', 'raw_mtu': '65535', 'mac': '00:00:00:00:00:00'},
+        '::1': {
+            'raw_mtu': '65536', 'mac': '00:00:00:00:00:00'}} == result
 
 
 def test_connect():

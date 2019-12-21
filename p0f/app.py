@@ -1,4 +1,5 @@
 import datetime
+import ipaddress
 import json
 import os
 import shutil
@@ -66,7 +67,7 @@ def parse_eth(packet):
 def run_tshark(path):
     addresses = set()
     with pyshark.FileCapture(path, include_raw=False, keep_packets=False,
-                             custom_parameters=['-o', 'tcp.desegment_tcp_streams:false', '-n']) as cap:
+                             custom_parameters=['-o', 'tcp.desegment_tcp_streams:false']) as cap:
         for packet in cap:
             src_eth_address, dst_eth_address = parse_eth(packet)
             src_address, dst_address = parse_ip(packet)
@@ -80,26 +81,31 @@ def parse_output(p0f_output, addresses):
     results = {}
     for p0f_line in p0f_output.splitlines():
         fields = p0f_line.split('|')
-        _, mod = fields[0].rsplit(' ', 1)
-        if mod == 'mod=syn':
-            mod_data = {}
-            for field in fields[1:]:
-                k, v = field.split('=')
-                mod_data[k] = v
-            subj = mod_data.get('subj', None)
-            if subj:
-                try:
-                    host = mod_data[subj].split('/')[0]
-                    full_os = mod_data['os']
-                    short_os = full_os.split(' ')[0]
-                    results[host] = {
-                        'full_os': full_os,
-                        'short_os': short_os}
-                except KeyError:
-                    continue
+        fields_data = {}
+        for field in fields[1:]:
+            k, v = field.split('=', 1)
+            fields_data[k] = v
+        subj = fields_data.get('subj', None)
+        host = str(ipaddress.ip_address(fields_data[subj].split('/')[0]))
+        host_results = {}
+        if 'os' in fields_data:
+            full_os = fields_data['os']
+            if not full_os.startswith('?'):
+                short_os = full_os.split(' ')[0]
+                host_results.update({
+                    'full_os': full_os,
+                    'short_os': short_os})
+        for host_field in ('link', 'raw_mtu'):
+            host_value = fields_data.get(host_field, None)
+            if host_value is not None and not host_value.startswith('?'):
+                host_results.update({host_field: host_value})
+        if host_results:
+            if host not in results:
+                results[host] = {}
+            results[host].update(host_results)
     for address, eth_address in addresses:
         if address in results:
-            results[address]['mac'] = eth_address
+            results[address].update({'mac': eth_address})
     return results
 
 def connect():
@@ -173,10 +179,14 @@ def main():
             version = get_version()
             try:
                 channel = connect_rabbit()
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'p0f', 'version': version}}
+                body = {
+                    'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {
+                        'tool': 'p0f', 'version': version}}
                 send_rabbit_msg(body, channel)
                 if path == pcap_paths[-1]:
-                    body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'p0f', 'version': version}}
+                    body = {
+                        'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {
+                            'tool': 'p0f', 'version': version}}
                     send_rabbit_msg(body, channel)
             except Exception as e:
                 print(str(e))
