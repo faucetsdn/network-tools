@@ -1,13 +1,16 @@
-dist: xenial
-
+dist: bionic
 language: python
 cache: pip
 python:
   - "3.7"
+addons:
+  apt:
+    update: true
+    packages:
+      - p0f
+      - tshark
 install:
   - pip3 install codecov pytest-cov pytype
-before_install:
-  - sudo apt-get update
 jobs:
   include:
   - stage: test

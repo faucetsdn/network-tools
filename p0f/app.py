@@ -1,12 +1,15 @@
 import datetime
+import ipaddress
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
 import time
 
 import pika
+import pyshark
 import redis
 
 
@@ -21,12 +24,9 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
     channel.basic_publish(exchange=exchange,
                           routing_key=routing_key,
                           body=json.dumps(msg),
-                          properties=pika.BasicProperties(
-                          delivery_mode=2,
-                         ))
+                          properties=pika.BasicProperties(delivery_mode=2))
     print(" [X] %s UTC %r %r" % (str(datetime.datetime.utcnow()),
                                  str(msg['id']), str(msg['file_path'])))
-    return
 
 def get_version():
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'VERSION'), 'r') as f:
@@ -36,38 +36,76 @@ def run_proc(args, output=subprocess.DEVNULL):
     proc = subprocess.Popen(args, stdout=output)
     return proc.communicate()
 
-def run_p0f(path, p0f_output, p0f='/usr/bin/p0f'):
-    args = [p0f, '-r', path, '-o', p0f_output]
-    return run_proc(args)
-
-def run_tshark(path, tshark_output, tshark='/usr/bin/tshark'):
-    exit_status = []
+def run_p0f(path):
     with tempfile.TemporaryDirectory() as tempdir:
-        tshark_tmp = os.path.join(tempdir, 'fields.txt')
-        with open(tshark_tmp, 'w') as output:
-            args = [tshark, '-r', path, '-T', 'fields', '-e', 'eth.src', '-e', 'ip.src']
-            exit_status.append(run_proc(args, output=output))
-            args = [tshark, '-r', path, '-T', 'fields', '-e', 'ip.src', '-e', 'eth.src']
-            exit_status.append(run_proc(args, output=output))
-        lines = set([line.strip() for line in open(tshark_tmp, 'r').readlines() if line])
-        text = '\n'.join([line for line in lines])
-        open(tshark_output, 'w').write(text)
-    return exit_status
+        p0f = shutil.which('p0f')
+        # p0f not in PATH, default to alpine location.
+        if p0f is None:
+            p0f = '/usr/bin/p0f'
+        p0f_output = os.path.join(tempdir, 'p0f_output.txt')
+        args = [p0f, '-r', path, '-o', p0f_output]
+        run_proc(args)
+        with open(p0f_output, 'r') as f:
+            return f.read()
 
-def parse_output(p0f_output, tshark_output):
+def parse_ip(packet):
+    for ip_type in ('ip', 'ipv6'):
+        try:
+            ip_fields = getattr(packet, ip_type)
+        except AttributeError:
+            continue
+        src_ip_address = getattr(ip_fields, '%s.src' % ip_type)
+        dst_ip_address = getattr(ip_fields, '%s.dst' % ip_type)
+        return (src_ip_address, dst_ip_address)
+    return (None, None)
+
+def parse_eth(packet):
+    src_eth_address = packet.eth.src
+    dst_eth_address = packet.eth.dst
+    return (src_eth_address, dst_eth_address)
+
+def run_tshark(path):
+    addresses = set()
+    with pyshark.FileCapture(path, include_raw=False, keep_packets=False,
+                             custom_parameters=['-o', 'tcp.desegment_tcp_streams:false']) as cap:
+        for packet in cap:
+            src_eth_address, dst_eth_address = parse_eth(packet)
+            src_address, dst_address = parse_ip(packet)
+            if src_eth_address and src_address:
+                addresses.add((src_address, src_eth_address))
+            if dst_eth_address and dst_address:
+                addresses.add((dst_address, dst_eth_address))
+    return addresses
+
+def parse_output(p0f_output, addresses):
     results = {}
-    with open(p0f_output, 'r') as f:
-        for line in f:
-            l = " ".join(line.split()[2:])
-            l = l.split('|')
-            if l[0] == 'mod=syn':
-                results[l[1].split('cli=')[1].split('/')[0]] = {'full_os': l[4].split('os=')[1], 'short_os': l[4].split('os=')[1].split()[0]}
-    with open(tshark_output, 'r') as f:
-        for line in f:
-            pair = line.split()
-            if len(pair) == 2:
-                if pair[0] in results:
-                    results[pair[0]]['mac'] = pair[1]
+    for p0f_line in p0f_output.splitlines():
+        fields = p0f_line.split('|')
+        fields_data = {}
+        for field in fields[1:]:
+            k, v = field.split('=', 1)
+            fields_data[k] = v
+        subj = fields_data.get('subj', None)
+        host = str(ipaddress.ip_address(fields_data[subj].split('/')[0]))
+        host_results = {}
+        if 'os' in fields_data:
+            full_os = fields_data['os']
+            if not full_os.startswith('?'):
+                short_os = full_os.split(' ')[0]
+                host_results.update({
+                    'full_os': full_os,
+                    'short_os': short_os})
+        for host_field in ('link', 'raw_mtu'):
+            host_value = fields_data.get(host_field, None)
+            if host_value is not None and not host_value.startswith('?'):
+                host_results.update({host_field: host_value})
+        if host_results:
+            if host not in results:
+                results[host] = {}
+            results[host].update(host_results)
+    for address, eth_address in addresses:
+        if address in results:
+            results[address].update({'mac': eth_address})
     return results
 
 def connect():
@@ -125,32 +163,33 @@ def main():
     else:
         pcap_paths.append(path)
 
-    with tempfile.TemporaryDirectory() as tempdir:
-        p0f_output = os.path.join(tempdir, 'p0f_output.txt')
-        tshark_output = os.path.join(tempdir, 'tshark_output.txt')
 
-        for path in pcap_paths:
-            run_p0f(path, p0f_output)
-            run_tshark(path, tshark_output)
-            results = parse_output(p0f_output, tshark_output)
-            print(results)
+    for path in pcap_paths:
+        p0f_output = run_p0f(path)
+        addresses = run_tshark(path)
+        results = parse_output(p0f_output, addresses)
+        print(results)
 
-            if os.environ.get('redis', '') == 'true':
-                r = connect()
-                save(r, results)
+        if os.environ.get('redis', '') == 'true':
+            r = connect()
+            save(r, results)
 
-            if os.environ.get('rabbit', '') == 'true':
-                uid = os.environ.get('id', '')
-                version = get_version()
-                try:
-                    channel = connect_rabbit()
-                    body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'p0f', 'version': version}}
+        if os.environ.get('rabbit', '') == 'true':
+            uid = os.environ.get('id', '')
+            version = get_version()
+            try:
+                channel = connect_rabbit()
+                body = {
+                    'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {
+                        'tool': 'p0f', 'version': version}}
+                send_rabbit_msg(body, channel)
+                if path == pcap_paths[-1]:
+                    body = {
+                        'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {
+                            'tool': 'p0f', 'version': version}}
                     send_rabbit_msg(body, channel)
-                    if path == pcap_paths[-1]:
-                        body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'p0f', 'version': version}}
-                        send_rabbit_msg(body, channel)
-                except Exception as e:
-                    print(str(e))
+            except Exception as e:
+                print(str(e))
 
 
 if __name__ == "__main__":  # pragma: no cover
