@@ -1,10 +1,5 @@
 FROM alpine:3.11
-LABEL maintainer="Charlie Lewis <clewis@iqt.org>" \
-      vent="" \
-      vent.name="network_tap" \
-      vent.groups="files,network" \
-      vent.repo="https://github.com/cyberreboot/vent" \
-      vent.type="repository"
+LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 COPY ncontrol/requirements.txt requirements.txt
 COPY healthcheck /healthcheck
