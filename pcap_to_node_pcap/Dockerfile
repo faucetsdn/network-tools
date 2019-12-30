@@ -1,9 +1,6 @@
 FROM debian:stretch-slim
 
-LABEL maintainer = "Charlie Lewis <clewis@iqt.org>" \
-      vent = "" \
-      vent.name = "node pcap" \
-      vent.groups = "pcap"
+LABEL maintainer = "Charlie Lewis <clewis@iqt.org>"
 
 ENV DEBIAN_FRONTEND = "noninteractive"
 

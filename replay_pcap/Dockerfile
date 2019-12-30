@@ -1,8 +1,5 @@
 FROM ubuntu:19.10
 LABEL maintainer="Jeff Wang <jwang@iqt.org>"
-LABEL vent = "" \
-      vent.name = "node pcap" \
-      vent.groups = "replay"
 
 RUN apt-get -y update && apt-get install -y --no-install-recommends \
     tcpreplay \
