@@ -26,7 +26,7 @@ that feature *on top of* Vent Plugins!
 ### Create issues...
 
 Any significant improvement should be documented as [a github
-issue](https://github.com/CyberReboot/vent-plugins/issues) before anybody
+issue](https://github.com/CyberReboot/network-tools/issues) before anybody
 starts working on it.
 
 ### ...but check for existing issues first!
