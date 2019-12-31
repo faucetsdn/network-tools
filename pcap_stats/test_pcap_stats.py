@@ -4,6 +4,7 @@ Test module for tcprewrite.py
 Created on 20 December 2018
 @author: Charlie Lewis
 """
+import os
 import sys
 
 from .pcap_stats import condense_conversations
@@ -32,6 +33,7 @@ def test_run_tool():
 
 
 def test_get_version():
+    os.system('cp pcap_stats/VERSION VERSION')
     version = get_version()
 
 
@@ -40,6 +42,6 @@ def test_get_ether_vendor():
 
 
 def test_condense_conversations():
-    results = {'tshark': {'tcp': {'Source': '0.0.0.0:12', 'Destination': '1.2.3.4:42'}}}
+    results = {'tshark': {'tcp': [{'Source': '0.0.0.0:12', 'Destination': '1.2.3.4:42'}]}}
     conv_type = 'tcp'
     prot_ip_map = condense_conversations(results, conv_type)
