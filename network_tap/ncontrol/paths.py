@@ -147,7 +147,7 @@ class InfoR(object):
     """
 
     def on_get(self, req, resp):
-        resp.body = json.dumps({'version': 'v0.1.0'})
+        resp.body = json.dumps({'version': 'v0.11.0'})
         resp.content_type = falcon.MEDIA_TEXT
         resp.status = falcon.HTTP_200
         return
