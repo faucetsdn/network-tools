@@ -147,7 +147,11 @@ class InfoR(object):
     """
 
     def on_get(self, req, resp):
-        resp.body = json.dumps({'version': open('VERSION', 'r').read().strip()})
+        try:
+            version = open('VERSION', 'r').read().strip()
+        except Exception as e:  # pragma: no cover
+            version = str(e)
+        resp.body = json.dumps({'version': version})
         resp.content_type = falcon.MEDIA_TEXT
         resp.status = falcon.HTTP_200
         return
