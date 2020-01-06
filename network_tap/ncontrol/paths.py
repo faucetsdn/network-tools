@@ -147,7 +147,11 @@ class InfoR(object):
     """
 
     def on_get(self, req, resp):
-        resp.body = json.dumps({'version': 'v0.11.1.dev'})
+        try:
+            version = open('VERSION', 'r').read().strip()
+        except Exception as e:  # pragma: no cover
+            version = str(e)
+        resp.body = json.dumps({'version': version})
         resp.content_type = falcon.MEDIA_TEXT
         resp.status = falcon.HTTP_200
         return
@@ -189,38 +193,6 @@ class ListR(object):
             return
 
         resp.body = json.dumps(container_list)
-        return
-
-
-class NICsR(object):
-    """
-    This endpoint is for listing all available network interfaces
-    """
-
-    def on_get(self, req, resp):
-        """
-        Send a GET request to get the list of all available network interfaces
-        """
-        resp.content_type = falcon.MEDIA_TEXT
-        resp.status = falcon.HTTP_200
-
-        # connect to docker
-        try:
-            d_client = docker.from_env()
-        except Exception as e:  # pragma: no cover
-            resp.body = "(False, 'unable to connect to docker because: " + str(e) + "')"
-            return
-
-        # start container to get network interfaces
-        nics = ''
-        try:
-            nics = d_client.containers.run('cyberreboot/gonet',
-                                           network_mode='host', remove=True)
-            resp.body = '(True, ' + str(nics.id) + ')'
-        except Exception as e:  # pragma: no cover
-            resp.body = "(False, 'Failure because: " + str(e) + "')"
-            return
-
         return
 
 
