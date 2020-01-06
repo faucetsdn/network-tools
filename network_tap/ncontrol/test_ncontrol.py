@@ -56,13 +56,6 @@ def test_list_r(client):
     assert r.status == '200 OK'
 
 
-def test_nics_r(client):
-    """ tests the restful endpoint: nics """
-    # test nics
-    r = client.simulate_get('/nics')
-    assert r.status == '200 OK'
-
-
 def test_stop_r(client):
     """ tests the restful endpoint: stop """
     # create some container and start it
