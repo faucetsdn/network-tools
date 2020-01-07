@@ -154,9 +154,6 @@ def parse_tshark(output):
                     if result.startswith('UDP') or result.startswith('TCP') or result.startswith('STCP'):
                         endpoint, port, packet_count, byte_count, tx_packets, tx_bytes, rx_packets, rx_bytes = line.split()
                         conv = {'Endpoint': endpoint, 'Port': port, 'Packets': packet_count, 'Bytes': byte_count, 'Tx Packets': tx_packets, 'Tx Bytes': tx_bytes, 'Rx Packets': rx_packets, 'Rx Bytes': rx_bytes}
-                        if 'Ethernet' in result:
-                            conv['Endpoint Vendor'] = get_ether_vendor(endpoint)
-                        endpoints.append(conv)
                     else:
                         endpoint, packet_count, byte_count, tx_packets, tx_bytes, rx_packets, rx_bytes = line.split()
                         conv = {'Endpoint': endpoint, 'Packets': packet_count, 'Bytes': byte_count, 'Tx Packets': tx_packets, 'Tx Bytes': tx_bytes, 'Rx Packets': rx_packets, 'Rx Bytes': rx_bytes}
