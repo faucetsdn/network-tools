@@ -27,7 +27,7 @@ def test_version():
 
 
 def test_parse_output():
-    mercury_output = run_p0f(TEST_LO_CAP)
+    mercury_output = run_mercury(TEST_LO_CAP)
     result = parse_output(mercury_output)
     assert ['{"src_ip":"127.0.0.1","dst_ip":"127.0.0.1","src_port":46718,"dst_port":1025,"protocol":6,"event_start":1576897976.6209990978,"event_end":1576897976.6209990978,"fingerprints":[{"event_start":1576897976.6209990978,"tcp":"(aaaa)(0204ffd7)(04)(08)(01)(030309)"}]}', '{"src_ip":"::1","dst_ip":"::1","src_port":36728,"dst_port":1025,"protocol":6,"event_start":1576897991.0116009712,"event_end":1576897991.0116009712,"fingerprints":[{"event_start":1576897991.0116009712,"tcp":"(aaaa)(0204ffc4)(04)(08)(01)(030309)"}]}', '{"src_ip":"::1","dst_ip":"::1","src_port":36730,"dst_port":1025,"protocol":6,"event_start":1576897996.539536953,"event_end":1576897996.539536953,"fingerprints":[{"event_start":1576897996.539536953,"tcp":"(aaaa)(0204ffc4)(04)(08)(01)(030309)"}]}'] == result
 
