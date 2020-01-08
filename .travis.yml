@@ -8,6 +8,8 @@ addons:
     update: true
     packages:
       - p0f
+      - libpcap0.8
+      - libpcap-dev
       - tshark
 install:
   - pip3 install codecov pytest-cov pytype
