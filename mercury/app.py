@@ -36,7 +36,7 @@ def run_mercury(path):
     with tempfile.TemporaryDirectory() as tempdir:
         mercury = shutil.which('pmercury')
         mercury_output = os.path.join(tempdir, 'mercury_output.txt')
-        args = [mercury, '-aweg', '-r', path, '-f', mercury_output]
+        args = [mercury, '-awxg', '-r', path, '-f', mercury_output]
         run_proc(args)
         with open(mercury_output, 'r') as f:
             return f.read()
