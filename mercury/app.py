@@ -44,7 +44,7 @@ def run_mercury(path):
 def parse_output(mercury_output):
     results = []
     for mercury_line in mercury_output.splitlines():
-        results.append(mercury_line)
+        results.append(json.loads(mercury_line))
     return results
 
 def ispcap(pathfile):
@@ -74,10 +74,11 @@ def main():
             version = get_version()
             try:
                 channel = connect_rabbit()
-                body = {
-                    'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {
-                        'tool': 'mercury', 'version': version}}
-                send_rabbit_msg(body, channel)
+                if results:
+                    body = {
+                        'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {
+                            'tool': 'mercury', 'version': version}}
+                    send_rabbit_msg(body, channel)
                 if path == pcap_paths[-1]:
                     body = {
                         'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {
