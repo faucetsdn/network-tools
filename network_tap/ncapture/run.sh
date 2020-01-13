@@ -5,6 +5,12 @@ INTERVAL="$2"
 ID="$3"
 ITERS="$4"
 FILTER="$5"
+if [ -z "$6" ]; then
+    OUT_PATH="/files/"
+else
+    OUT_PATH="$6"
+fi
+
 # TODO: migrate above static args to getopt style.
 
 # check if filter has '' surrounding it
@@ -22,7 +28,6 @@ PAYS="4"
 # Set number of DNS payload size to keep in bytes
 DPAYS="12"
 
-OUT_PATH="/files/"
 
 while getopts "a:c:d:s:" arg; do
   case $arg in
