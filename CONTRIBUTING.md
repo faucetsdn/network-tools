@@ -1,10 +1,8 @@
-# Contributing to Vent Plugins
+# Contributing to Network Tools
 
-Want to hack on Vent plugins? Awesome! Here are instructions to get you
+Want to hack on network tools? Awesome! Here are instructions to get you
 started.  They are probably not perfect, please let us know if anything
 feels wrong or incomplete.
-
-Looking for Vent? [You'll find it here.](https://github.com/CyberReboot/vent)
 
 ## Contribution guidelines
 
@@ -18,10 +16,10 @@ If your pull request is not accepted on the first try, don't be
 discouraged! If there's a problem with the implementation, hopefully
 you received feedback on what to improve.
 
-We're trying very hard to keep Vent lean and focused. We don't want it
+We're trying very hard to keep Network Tools lean and focused. We don't want it
 to do everything for everybody. This means that we might decide against
 incorporating a new feature. However, there might be a way to implement
-that feature *on top of* Vent Plugins!
+that feature *on top of* Network Tools!
 
 ### Create issues...
 
@@ -37,10 +35,6 @@ never hurts to add a quick "+1" or "I have this problem too". This will
 help prioritize the most common problems and requests.
 
 ### Conventions
-
-Fork the repo and make changes on your fork in the master branch. (Vent loads
-plugins from the Master branch exclusively, so it won't pickup changes made in
-a feature branch!)
 
 Make sure you include relevant updates or additions to documentation and
 tests when creating or modifying features.
@@ -67,9 +61,9 @@ mismatch may result in your changes being overwritten.
 
 ### How are decisions made?
 
-Short answer: with pull requests to the Vent plugins repository.
+Short answer: with pull requests to the Network Tools repository.
 
-All decisions affecting Vent plugins, big and small, follow the same 3 steps:
+All decisions affecting Network Tools, big and small, follow the same 3 steps:
 
 * Step 1: Open a pull request. Anyone can do this.
 
@@ -91,7 +85,7 @@ to make a difference on the project!
 It is every maintainer's responsibility to:
 
 * 1) Deliver prompt feedback and decisions on pull requests.
-* 2) Be available to anyone with questions, bug reports, criticism etc. on Vent.
+* 2) Be available to anyone with questions, bug reports, criticism etc. on Network Tools 
 
 ### How is this process changed?
 
