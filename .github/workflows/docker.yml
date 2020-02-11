@@ -41,6 +41,10 @@ jobs:
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
           --push \
+          -t cyberreboot/ncapture:${{ steps.change_version.outputs.VERSION }} network_tap/ncapture && \
+        docker buildx build \
+          --platform linux/amd64,linux/arm/v7,linux/arm64 \
+          --push \
           -t cyberreboot/network-tap:${{ steps.change_version.outputs.VERSION }} network_tap && \
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
@@ -57,9 +61,9 @@ jobs:
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
           --push \
-          -t cyberreboot/snort:${{ steps.change_version.outputs.VERSION }} snort && \
+          -t cyberreboot/tcprewrite-dot1q:${{ steps.change_version.outputs.VERSION }} tcprewrite_dot1q && \
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
           --push \
-          -t cyberreboot/tcprewrite-dot1q:${{ steps.change_version.outputs.VERSION }} tcprewrite_dot1q
+          -t cyberreboot/snort:${{ steps.change_version.outputs.VERSION }} snort
       if: github.repository == 'cyberreboot/network-tools' && github.event_name == 'push'
