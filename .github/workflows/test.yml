@@ -25,6 +25,8 @@ jobs:
         coverage report && coverage xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1.0.5
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
       if: github.repository == 'cyberreboot/network-tools' && github.event_name == 'push'
