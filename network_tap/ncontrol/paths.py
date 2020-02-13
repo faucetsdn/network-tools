@@ -78,7 +78,7 @@ class CreateR(object):
             cmd += ' ' + payload['id'] + ' ' + payload['iters'] + ' "'
             cmd += payload['filter'] + '"'
             try:
-                container = c.containers.run(image='cyberreboot/ncapture:v0.11.1',
+                container = c.containers.run(image='cyberreboot/ncapture:v0.11.2',
                                              command=cmd, remove=True, detach=True, **tool_d)
                 resp.body = "(True, 'successfully created and started filter: " + \
                     str(payload['id']) + ' on container: ' + \
@@ -182,7 +182,7 @@ class ListR(object):
             for c in containers.containers.list(all=True):
                 # TODO: maybe find a way to not have to hard code image name
                 if c.attrs['Config']['Image'] == \
-                        'cyberreboot/ncapture:v0.11.1':
+                        'cyberreboot/ncapture:v0.11.2':
                     lst = {}
                     lst['id'] = c.attrs['Id'][:12]
                     lst['status'] = c.attrs['State']['Status']
