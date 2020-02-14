@@ -26,7 +26,7 @@ def test_ispcap():
 
 
 def test_version():
-    assert get_version() == '0.11.3'
+    assert get_version() == '0.11.4.dev'
 
 
 def test_parse_output():
