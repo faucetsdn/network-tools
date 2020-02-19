@@ -1,4 +1,5 @@
 import json
+import os
 import socket
 
 import docker
@@ -70,6 +71,10 @@ class CreateR(object):
 
         # spin up container with payload specifications
         if c:
+            keep_images = os.getenv('KEEPIMAGES', '0')
+            remove = True
+            if keep_images == '1':
+                remove = False
             tool_d = {'network': 'host',
                       'environment': ['PYTHONUNBUFFERED=1', 'rabbit=true', 'external_host=0.0.0.0'],
                       'volumes_from': [socket.gethostname()]}
@@ -79,7 +84,7 @@ class CreateR(object):
             cmd += payload['filter'] + '"'
             try:
                 container = c.containers.run(image='cyberreboot/ncapture:v0.11.3',
-                                             command=cmd, remove=True, detach=True, **tool_d)
+                                             command=cmd, remove=remove, detach=True, **tool_d)
                 resp.body = "(True, 'successfully created and started filter: " + \
                     str(payload['id']) + ' on container: ' + \
                     str(container.id) + "')"
