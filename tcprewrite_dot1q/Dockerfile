@@ -9,7 +9,7 @@ COPY VERSION VERSION
 # Install packages
 RUN apk update && \
     apk -U upgrade && \
-    apk add python3 tcpreplay && \
+    apk add python3 py3-pip tcpreplay && \
     rm -rf /root/* && \
     rm -rf /var/cache/apk/*
 
