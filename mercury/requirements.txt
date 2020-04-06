@@ -1,2 +1,2 @@
 pika==1.1.0
-pmercury==0.4.3.16
+pmercury==0.5.0.26
