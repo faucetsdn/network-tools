@@ -19,7 +19,6 @@ RUN apk add --update \
     && apk del \
     gcc \
     libffi-dev \
-    libpcap-dev \
     openssl-dev \
     python3-dev \
     && rm -rf /var/cache/apk/*
