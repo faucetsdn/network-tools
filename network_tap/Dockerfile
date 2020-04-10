@@ -8,7 +8,6 @@ RUN apk add --update \
     curl \
     gcc \
     git \
-    libffi-dev \
     linux-headers \
     musl-dev \
     python3 \
