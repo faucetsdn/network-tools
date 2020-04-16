@@ -10,7 +10,6 @@ import time
 
 import pika
 import pyshark
-import redis
 
 
 def connect_rabbit(host='messenger', port=5672, queue='task_queue'):
@@ -108,44 +107,6 @@ def parse_output(p0f_output, addresses):
             results[address].update({'mac': eth_address})
     return results
 
-def connect():
-    r = None
-    try:
-        r = redis.StrictRedis(host='redis', port=6379, db=0)
-    except Exception as e:  # pragma: no cover
-        try:
-            r = redis.StrictRedis(host='localhost', port=6379, db=0)
-        except Exception as e:  # pragma: no cover
-            print('Unable to connect to redis because: ' + str(e))
-    return r
-
-def save(r, results):
-    timestamp = str(int(time.time()))
-    if r:
-        try:
-            if isinstance(results, list):
-                for result in results:
-                    for key in result:
-                        redis_k = {}
-                        for k in result[key]:
-                            redis_k[k] = str(result[key][k])
-                        r.hmset(key, redis_k)
-                        r.hmset('p0f_'+timestamp+'_'+key, redis_k)
-                        r.sadd('ip_addresses', key)
-                        r.sadd('p0f_timestamps', timestamp)
-            elif isinstance(results, dict):
-                for key in results:
-                    redis_k = {}
-                    for k in results[key]:
-                        redis_k[k] = str(results[key][k])
-                    r.hmset(key, redis_k)
-                    r.hmset('p0f_'+timestamp+'_'+key, redis_k)
-                    r.sadd('ip_addresses', key)
-                    r.sadd('p0f_timestamps', timestamp)
-        except Exception as e:  # pragma: no cover
-            print('Unable to store contents of p0f: ' + str(results) +
-                  ' in redis because: ' + str(e))
-
 def ispcap(pathfile):
     for ext in ('pcap', 'pcapng', 'dump', 'capture'):
         if pathfile.endswith(''.join(('.', ext))):
@@ -169,10 +130,6 @@ def main():
         addresses = run_tshark(path)
         results = parse_output(p0f_output, addresses)
         print(results)
-
-        if os.environ.get('redis', '') == 'true':
-            r = connect()
-            save(r, results)
 
         if os.environ.get('rabbit', '') == 'true':
             uid = os.environ.get('id', '')
