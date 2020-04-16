@@ -8,10 +8,8 @@ import os
 import sys
 
 from .app import parse_output
-from .app import connect
 from .app import get_version
 from .app import ispcap
-from .app import save
 from .app import main
 from .app import run_tshark
 from .app import run_p0f
@@ -38,19 +36,6 @@ def test_parse_output():
             'full_os': 'Linux 2.2.x-3.x', 'short_os': 'Linux', 'raw_mtu': '65535', 'mac': '00:00:00:00:00:00'},
         '::1': {
             'raw_mtu': '65536', 'mac': '00:00:00:00:00:00'}} == result
-
-
-def test_connect():
-    r = connect()
-    assert r is not None
-
-
-def test_save():
-    r = connect()
-    results = {'foo':{'bar':'baz'}}
-    save(r, results)
-    results = [{'foo':{'bar':'baz'}}]
-    save(r, results)
 
 
 def test_main():
