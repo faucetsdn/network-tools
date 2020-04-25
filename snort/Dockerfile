@@ -12,6 +12,7 @@ RUN mkdir -p /var/log/snort && \
 
 RUN apt-get update && \
     apt-get install -y \
+        autoconf \
         python3 \
         python3-pip \
         wget \
@@ -21,6 +22,7 @@ RUN apt-get update && \
         libpcap-dev \
         libpcre3-dev \
         libdumbnet-dev \
+        libtool \
         zlib1g-dev \
         iptables-dev \
         libnetfilter-queue1 \
@@ -29,6 +31,7 @@ RUN apt-get update && \
         wget https://www.snort.org/downloads/archive/snort/daq-${DAQ_VERSION}.tar.gz \
         && tar xvfz daq-${DAQ_VERSION}.tar.gz \
         && cd daq-${DAQ_VERSION} \
+        && autoreconf -f -i \
         && ./configure; make; make install && \
         wget https://www.snort.org/downloads/archive/snort/snort-${SNORT_VERSION}.tar.gz \
         && tar xvfz snort-${SNORT_VERSION}.tar.gz \
