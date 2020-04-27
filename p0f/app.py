@@ -6,7 +6,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import time
 
 import pika
 import pyshark
@@ -135,11 +134,11 @@ def main():
             uid = os.environ.get('id', '')
             version = get_version()
             try:
-                channel = connect_rabbit()
+                channel = connect_rabbit(queue=os.getenv('RABBIT_QUEUE_NAME', 'task_queue'))
                 body = {
                     'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {
                         'tool': 'p0f', 'version': version}}
-                send_rabbit_msg(body, channel)
+                send_rabbit_msg(body, channel, routing_key=os.getenv('RABBIT_ROUTING_KEY', 'task_queue'))
                 if path == pcap_paths[-1]:
                     body = {
                         'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {
