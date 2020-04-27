@@ -16,7 +16,7 @@ def connect_rabbit(host='messenger', port=5672, queue='task_queue'):
     connection = pika.BlockingConnection(params)
     channel = connection.channel()
     channel.queue_declare(queue=queue, durable=True)
-    return channel
+    return (connection, channel)
 
 def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
     channel.basic_publish(exchange=exchange,
@@ -133,17 +133,21 @@ def main():
         if os.environ.get('rabbit', '') == 'true':
             uid = os.environ.get('id', '')
             version = get_version()
+            queue = os.getenv('RABBIT_QUEUE_NAME', 'task_queue')
+            routing_key = os.getenv('RABBIT_ROUTING_KEY', 'task_queue')
+            exchange = os.getenv('RABBIT_EXCHANGE', 'task_queue')
             try:
-                channel = connect_rabbit(queue=os.getenv('RABBIT_QUEUE_NAME', 'task_queue'))
+                connection, channel = connect_rabbit(queue=queue)
                 body = {
                     'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {
                         'tool': 'p0f', 'version': version}}
-                send_rabbit_msg(body, channel, routing_key=os.getenv('RABBIT_ROUTING_KEY', 'task_queue'))
+                send_rabbit_msg(body, channel, exchange=exchange, routing_key=routing_key)
                 if path == pcap_paths[-1]:
                     body = {
                         'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {
                             'tool': 'p0f', 'version': version}}
                     send_rabbit_msg(body, channel)
+                connection.close()
             except Exception as e:
                 print(str(e))
 
