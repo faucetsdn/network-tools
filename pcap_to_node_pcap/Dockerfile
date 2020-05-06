@@ -4,6 +4,7 @@ LABEL maintainer = "Charlie Lewis <clewis@iqt.org>"
 
 ENV DEBIAN_FRONTEND = "noninteractive"
 
+COPY main.cpp main.cpp
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     python3 \
@@ -15,6 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tshark \
     && cp `which tshark` /tshark \
     && GIT_SSL_NO_VERIFY=true git clone https://github.com/seladb/PcapPlusPlus.git /PcapPlusPlus \
+    && cp main.cpp /PcapPlusPlus/Examples/PcapSplitter/main.cpp \
     && cd /PcapPlusPlus \
     && /bin/bash ./configure-linux.sh --default \
     && make all \
