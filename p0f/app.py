@@ -1,6 +1,7 @@
 import datetime
 import ipaddress
 import json
+import logging
 import os
 import shutil
 import subprocess
@@ -113,6 +114,8 @@ def ispcap(pathfile):
     return False
 
 def main():
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
     pcap_paths = []
     path = sys.argv[1]
     if os.path.isdir(path):
