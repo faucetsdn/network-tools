@@ -229,6 +229,8 @@ int main(int argc, char* argv[])
 	{
 		switch (opt)
 		{
+			case 0:
+				break;
 			case 'f':
 				inputPcapFileName = optarg;
 				break;
@@ -252,7 +254,8 @@ int main(int argc, char* argv[])
 				printAppVersion();
 				break;
 			default:
-				break;
+				printUsage();
+				exit(-1);
 		}
 	}
 
