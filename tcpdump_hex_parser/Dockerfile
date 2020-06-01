@@ -1,8 +1,8 @@
-FROM alpine:3.11
+FROM alpine:3.12
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 RUN apk add --update \
-    python \
+    python3 \
     tcpdump \
     && rm -rf /var/cache/apk/*
 

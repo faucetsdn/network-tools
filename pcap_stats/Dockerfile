@@ -1,4 +1,4 @@
-FROM alpine:3.11
+FROM alpine:3.12
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 COPY requirements.txt requirements.txt
@@ -7,7 +7,7 @@ COPY VERSION VERSION
 # Install packages
 RUN apk update && \
     apk -U upgrade && \
-    apk add python3 tshark && \
+    apk add python3 py3-pip tshark && \
     rm -rf /root/* && \
     rm -rf /var/cache/apk/*
 
