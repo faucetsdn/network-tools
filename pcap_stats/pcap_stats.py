@@ -25,7 +25,9 @@ def striptxt_pcap(pcap):
     packet_count = 0
     unencrypted_packet_count = 0
     encrypted_packet_count = 0
-    convs = {'Total Packets': 0, 'Plaintext Packets': 0, 'Encrypted Packets': 0, 'Plaintext Conversations':[], 'Encrypted Conversations':[]}
+    encrypted_len = 0
+    unencrypted_len = 0
+    convs = {'Total Packets': 0, 'Plaintext Packets': 0, 'Encrypted Packets': 0, 'Plaintext Bytes': 0, 'Encrypted Bytes': 0, 'Plaintext Conversations':[], 'Encrypted Conversations':[]}
     for session in sessions:
         http_payload = b""
         encrypted = 'unknown'
@@ -38,6 +40,10 @@ def striptxt_pcap(pcap):
                 payload = payload.decode('utf-8')
                 word_tuple = [w for w in tokenizer(payload)]
                 encrypted = 'Plaintext Conversations' if word_tuple else 'Encrypted Conversations'
+                if encrypted == 'Plaintext Conversations':
+                    encrypted_len += len(packet[TCP].payload)
+                else:
+                    unencrypted_len += len(packet[TCP].payload)
                 convs[encrypted].append(f'{packet[IP].src}:{packet[TCP].sport},{packet[IP].dst}:{packet[TCP].dport}')
             except Exception as e:
                 pass
@@ -46,6 +52,10 @@ def striptxt_pcap(pcap):
                 payload = payload.decode('utf-8')
                 word_tuple = [w for w in tokenizer(payload)]
                 encrypted = 'Plaintext Conversations' if word_tuple else 'Encrypted Conversations'
+                if encrypted == 'Plaintext Conversations':
+                    encrypted_len += len(packet[UDP].payload)
+                else:
+                    unencrypted_len += len(packet[UDP].payload)
                 convs[encrypted].append(f'{packet[IP].src}:{packet[UDP].sport},{packet[IP].dst}:{packet[UDP].dport}')
             except Exception as e:
                 pass
@@ -57,6 +67,8 @@ def striptxt_pcap(pcap):
     convs['Total Packets'] = packet_count
     convs['Plaintext Packets'] = unencrypted_packet_count
     convs['Encrypted Packets'] = encrypted_packet_count
+    convs['Plaintext Bytes'] = unencrypted_len
+    convs['Encrypted Bytes'] = encrypted_len
     convs['Plaintext Conversations'] = list(set(convs['Plaintext Conversations']))
     convs['Encrypted Conversations'] = list(set(convs['Encrypted Conversations']))
     results = {'convcontents': convs}
