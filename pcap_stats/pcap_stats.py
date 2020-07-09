@@ -14,6 +14,54 @@ import sys
 
 import pika
 
+from enchant.tokenize import get_tokenizer
+from scapy.all import *
+
+
+def striptxt_pcap(pcap):
+    tokenizer = get_tokenizer("en_US")
+    a = rdpcap(pcap)
+    sessions = a.sessions()
+    packet_count = 0
+    unencrypted_packet_count = 0
+    encrypted_packet_count = 0
+    convs = {'Total Packets': 0, 'Plaintext Packets': 0, 'Encrypted Packets': 0, 'Plaintext Conversations':[], 'Encrypted Conversations':[]}
+    for session in sessions:
+        http_payload = b""
+        encrypted = 'unknown'
+        session_packets = 0
+        for packet in sessions[session]:
+            session_packets += 1
+            packet_count += 1
+            try:
+                payload = bytes(packet[TCP].payload)
+                payload = payload.decode('utf-8')
+                word_tuple = [w for w in tokenizer(payload)]
+                encrypted = 'Plaintext Conversations' if word_tuple else 'Encrypted Conversations'
+                convs[encrypted].append(f'{packet[IP].src}:{packet[TCP].sport},{packet[IP].dst}:{packet[TCP].dport}')
+            except Exception as e:
+                pass
+            try:
+                payload = bytes(packet[UDP].payload)
+                payload = payload.decode('utf-8')
+                word_tuple = [w for w in tokenizer(payload)]
+                encrypted = 'Plaintext Conversations' if word_tuple else 'Encrypted Conversations'
+                convs[encrypted].append(f'{packet[IP].src}:{packet[UDP].sport},{packet[IP].dst}:{packet[UDP].dport}')
+            except Exception as e:
+                pass
+        if encrypted == 'Plaintext Conversations':
+            unencrypted_packet_count += session_packets
+        elif encrypted == 'Encrypted Conversations':
+            encrypted_packet_count += session_packets
+
+    convs['Total Packets'] = packet_count
+    convs['Plaintext Packets'] = unencrypted_packet_count
+    convs['Encrypted Packets'] = encrypted_packet_count
+    convs['Plaintext Conversations'] = list(set(convs['Plaintext Conversations']))
+    convs['Encrypted Conversations'] = list(set(convs['Encrypted Conversations']))
+    results = {'convcontents': convs}
+    print(results)
+    return results
 
 def connect_rabbit(host='messenger', port=5672, queue='task_queue'):
     params = pika.ConnectionParameters(host=host, port=port)
@@ -91,6 +139,15 @@ def run_capinfos(path):
 
     results = parse_capinfos(output)
     return results
+
+def get_asn(endpoint):
+    output = ''
+    try:
+        output = subprocess.check_output(shlex.split(' '.join(['bash', 'asn.sh', endpoint])))
+        output = output.decode("utf-8").strip()
+    except Exception as e:
+        print(str(e))
+    return output
 
 def get_ether_vendor(mac, lookup_path='nmap-mac-prefixes.txt'):
     """
@@ -256,7 +313,7 @@ def condense_conversations(results, conv_type):
             src_ip, src_port = conversation['Source'].rsplit(':', 1)
             dst_ip, dst_port = conversation['Destination'].rsplit(':', 1)
             if src_ip not in prot_ip_map:
-                prot_ip_map[src_ip] = {'Destinations': [], 'Source Ports': [], 'Destination Ports': []}
+                prot_ip_map[src_ip] = {'Destinations': [], 'Source Ports': [], 'Destination Ports': [], 'ASN': get_asn(src_ip)}
             if src_port not in prot_ip_map[src_ip]['Source Ports']:
                 prot_ip_map[src_ip]['Source Ports'].append(src_port)
             if dst_port not in prot_ip_map[src_ip]['Destination Ports']:
@@ -300,6 +357,9 @@ if __name__ == '__main__':  # pragma: no cover
                 tshark_results = run_tshark(path)
                 body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': tshark_results, 'results': {'tool': 'pcap-stats', 'version': get_version()}}
                 send_rabbit_msg(body, channel)
+                text_results = striptxt_pcap(path)
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': text_results, 'results': {'tool': 'pcap-stats', 'version': get_version()}}
+                send_rabbit_msg(body, channel)
                 body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'pcap-stats', 'version': get_version()}}
                 send_rabbit_msg(body, channel)
             except Exception as e:
@@ -307,3 +367,4 @@ if __name__ == '__main__':  # pragma: no cover
         else:
             capinfos_results = run_capinfos(path)
             tshark_results = run_tshark(path)
+            text_results = striptxt_pcap(path)
