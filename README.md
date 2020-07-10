@@ -5,4 +5,4 @@
 [![codecov](https://codecov.io/gh/CyberReboot/network-tools/branch/master/graph/badge.svg)](https://codecov.io/gh/CyberReboot/network-tools)
 [![Docker Hub Downloads](https://img.shields.io/docker/pulls/cyberreboot/p0f.svg)](https://hub.docker.com/u/cyberreboot)
 
-This project is a place for network traffic related tools that run on various projects, such as [Poseidon](https://github.com/CyberReboot/poseidon).
+This project is a place for network traffic related tools that run on various projects, such as [Poseidon](https://github.com/CyberReboot/poseidon) and [Packet Cafe](https://github.com/CyberReboot/packet_cafe).
