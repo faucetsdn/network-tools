@@ -3,6 +3,7 @@ LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 COPY requirements.txt requirements.txt
 COPY VERSION VERSION
+ENV PYTHONUNBUFFERED 1
 
 # Install packages
 RUN apt-get update && \
