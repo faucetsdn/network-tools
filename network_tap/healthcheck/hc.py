@@ -11,7 +11,7 @@ envdump = EnvironmentDump(app, '/environment')
 
 def application_data():
     return {'maintainer': 'Charlie Lewis',
-            'git_repo': 'https://github.com/CyberReboot/network-tools',
+            'git_repo': 'https://github.com/IQTLabs/network-tools',
             'app': 'network_tap'}
 
 

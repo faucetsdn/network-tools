@@ -29,7 +29,7 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
       run: |
         echo "${DOCKER_PASSWORD}" | docker login --username "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-      if: github.repository == 'cyberreboot/network-tools' && github.event_name == 'push'
+      if: github.repository == 'iqtlabs/network-tools' && github.event_name == 'push'
 
     - name: Build and push platforms
       env:
@@ -38,33 +38,33 @@ jobs:
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
           --push \
-          -t cyberreboot/mercury:${{ steps.change_version.outputs.VERSION }} mercury && \
+          -t iqtlabs/mercury:${{ steps.change_version.outputs.VERSION }} mercury && \
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
           --push \
-          -t cyberreboot/ncapture:${{ steps.change_version.outputs.VERSION }} network_tap/ncapture && \
+          -t iqtlabs/ncapture:${{ steps.change_version.outputs.VERSION }} network_tap/ncapture && \
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
           --push \
-          -t cyberreboot/network-tap:${{ steps.change_version.outputs.VERSION }} network_tap && \
+          -t iqtlabs/network-tap:${{ steps.change_version.outputs.VERSION }} network_tap && \
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
           --push \
-          -t cyberreboot/p0f:${{ steps.change_version.outputs.VERSION }} p0f && \
+          -t iqtlabs/p0f:${{ steps.change_version.outputs.VERSION }} p0f && \
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
           --push \
-          -t cyberreboot/pcap-stats:${{ steps.change_version.outputs.VERSION }} pcap_stats && \
+          -t iqtlabs/pcap-stats:${{ steps.change_version.outputs.VERSION }} pcap_stats && \
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
           --push \
-          -t cyberreboot/pcap-to-node-pcap:${{ steps.change_version.outputs.VERSION }} pcap_to_node_pcap && \
+          -t iqtlabs/pcap-to-node-pcap:${{ steps.change_version.outputs.VERSION }} pcap_to_node_pcap && \
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
           --push \
-          -t cyberreboot/tcprewrite-dot1q:${{ steps.change_version.outputs.VERSION }} tcprewrite_dot1q && \
+          -t iqtlabs/tcprewrite-dot1q:${{ steps.change_version.outputs.VERSION }} tcprewrite_dot1q && \
         docker buildx build \
           --platform linux/amd64,linux/arm/v7,linux/arm64 \
           --push \
-          -t cyberreboot/snort:${{ steps.change_version.outputs.VERSION }} snort
-      if: github.repository == 'cyberreboot/network-tools' && github.event_name == 'push'
+          -t iqtlabs/snort:${{ steps.change_version.outputs.VERSION }} snort
+      if: github.repository == 'iqtlabs/network-tools' && github.event_name == 'push'
