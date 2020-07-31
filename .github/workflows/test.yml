@@ -29,4 +29,4 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-      if: github.repository == 'cyberreboot/network-tools'
+      if: github.repository == 'iqtlabs/network-tools'
