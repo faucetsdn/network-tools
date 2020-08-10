@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 URI="$1"
 INTERVAL="$2"

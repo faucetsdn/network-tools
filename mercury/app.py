@@ -56,6 +56,8 @@ def ispcap(pathfile):
 def main():
     pcap_paths = []
     path = sys.argv[1]
+    if path == "":
+        sys.exit(1)
     if os.path.isdir(path):
         for root, _, files in os.walk(path):
             for pathfile in files:

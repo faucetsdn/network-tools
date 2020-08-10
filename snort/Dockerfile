@@ -2,7 +2,7 @@ FROM debian:buster-slim
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 ENV DAQ_VERSION 2.0.7
-ENV SNORT_VERSION 2.9.16
+ENV SNORT_VERSION 2.9.16.1
 
 WORKDIR /opt
 
@@ -28,16 +28,18 @@ RUN apt-get update && \
         libnetfilter-queue1 \
         tcpdump \
         unzip && \
-        wget https://www.snort.org/downloads/snort/daq-${DAQ_VERSION}.tar.gz \
+        apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN wget https://www.snort.org/downloads/snort/daq-${DAQ_VERSION}.tar.gz \
         && tar xvfz daq-${DAQ_VERSION}.tar.gz \
         && cd daq-${DAQ_VERSION} \
         && autoreconf -f -i \
-        && ./configure; make; make install && \
-        wget https://www.snort.org/downloads/snort/snort-${SNORT_VERSION}.tar.gz \
+        && ./configure; make; make install \
+        && rm -rf /opt/daq-${DAQ_VERSION}.tar.gz
+RUN wget https://www.snort.org/downloads/snort/snort-${SNORT_VERSION}.tar.gz \
         && tar xvfz snort-${SNORT_VERSION}.tar.gz \
         && cd snort-${SNORT_VERSION} \
-        && ./configure --disable-open-appid; make; make install && \
-        apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /opt/snort-${SNORT_VERSION}.tar.gz /opt/daq-${DAQ_VERSION}.tar.gz
+        && ./configure --disable-open-appid; make; make install \
+        && rm -rf /opt/snort-${SNORT_VERSION}.tar.gz
 
 RUN ldconfig
 RUN touch /var/log/snort/alert
