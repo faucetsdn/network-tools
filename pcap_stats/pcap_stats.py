@@ -5,7 +5,7 @@ Created on 1 November 2019
 @author: Charlie Lewis
 """
 
-import datetime
+from datetime import datetime
 import json
 import os
 import shlex
@@ -89,7 +89,7 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
                           properties=pika.BasicProperties(
                           delivery_mode=2,
                          ))
-    print(" [X] %s UTC %r %r" % (str(datetime.datetime.utcnow()),
+    print(" [X] %s UTC %r %r" % (str(datetime.utcnow()),
                                  str(msg['id']), str(msg['file_path'])))
     return
 
