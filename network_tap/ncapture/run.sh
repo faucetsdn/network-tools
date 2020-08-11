@@ -75,7 +75,7 @@ run_tracecapd() {
 
     echo -e "format: pcapfile\nnamingscheme: ${name}\ncompressmethod: none\nrotationperiod: day\n" > $dwconf
     echo -e "anon: $ANON\nchecksum: $CSUM\npayload: $PAYS\ndnspayload: $DPAYS\n" > $ppconf
-    $(timeout -k2 ${interval}s tracecapd -t 1 -c $dwconf -p $ppconf -s $uri -f "$filter")
+    timeout --preserve-status -k2 ${interval}s tracecapd -t 1 -c $dwconf -p $ppconf -s $uri -f "$filter"
 }
 
 run_capture() {
