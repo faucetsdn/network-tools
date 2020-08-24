@@ -100,7 +100,7 @@ jobs:
       run: |
         for N in ${{ steps.get_images.outputs.NAMES }}
         do
-          TAGGED_IMAGE="${{ secrets.DOCKER_NAMESPACE }})/$(basename ${N}):${{ steps.publish_tag.outputs.TAG }}"
+          TAGGED_IMAGE="${{ secrets.DOCKER_NAMESPACE }}/$(basename ${N}):${{ steps.publish_tag.outputs.TAG }}"
           docker buildx build \
             --platform linux/amd64,linux/arm/v7,linux/arm64 \
             --push \
