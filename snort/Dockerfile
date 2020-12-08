@@ -2,7 +2,7 @@ FROM debian:buster-slim
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 ENV DAQ_VERSION 2.0.7
-ENV SNORT_VERSION 2.9.16.1
+ENV SNORT_VERSION 2.9.17
 
 WORKDIR /opt
 
