@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 """
 Run a provided tool with arguments, look for a correctly formatted JSON result, and send it over RabbitMQ.
