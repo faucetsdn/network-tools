@@ -102,7 +102,7 @@ def main(argv):
         except subprocess.CalledProcessError as err:
             sys.exit(err.returncode)
         rbqwrapper = RbqWrapper()
-        if self.rabbit_host:
+        if rbqwrapper.rabbit_host:
             rbqwrapper.output_msg()
 
 
