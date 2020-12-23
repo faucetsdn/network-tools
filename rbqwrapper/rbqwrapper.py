@@ -28,12 +28,14 @@ import sys
 
 import pika
 
+logging.getLogger("pika").setLevel(logging.WARNING)
+
 
 class RbqWrapper:
 
     def __init__(self):
         logging.basicConfig(
-            level=logging.DEBUG,
+            level=logging.INFO,
             handlers=[logging.StreamHandler(sys.stdout)]
         )
         self.logger = logging.getLogger('rbqwrapper')
