@@ -82,7 +82,7 @@ class RbqWrapper:
             with open(self.result_path) as result_path:
                 results = json.load(result_path)
         except (FileNotFoundError,) as err:
-            self.logger.info('could not read/parse JSON results from %s: %s', self.result_path, err)
+            self.logger.error('could not read/parse JSON results from %s: %s', self.result_path, err)
             return
         self.logger.info('read %s', results)
         if not self._validate_results(results):
