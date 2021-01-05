@@ -21,7 +21,7 @@ jobs:
       run: |
         echo ::set-output name=NAMES::${NAMES}
       env:
-        NAMES: mercury network_tap/ncapture network_tap p0f pcap_stats pcap_to_node_pcap tcprewrite_dot1q snort rbqwrapper
+        NAMES: rbqwrapper pcap_to_node_pcap tcprewrite_dot1q network_tap/ncapture network_tap p0f mercury pcap_stats snort
     - name: Get version number
       id: get_version
       run: |
