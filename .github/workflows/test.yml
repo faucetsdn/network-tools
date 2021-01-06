@@ -23,7 +23,7 @@ jobs:
         coverage report && coverage xml && \
         sudo ./network_tap/ncapture/test_ncapture.sh
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1.2.0
+      uses: codecov/codecov-action@v1.2.1
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
