@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED 1
 # Install packages
 # hadolint ignore=DL3008
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc libxml2-dev libxslt-dev python3-dev tshark p0f && \
+    apt-get install -y --no-install-recommends gcc libxml2-dev libxslt-dev python3-dev tshark p0f zlib1g-dev && \
     rm -rf /var/cache/* && \
     rm -rf /root/.cache/*
 
