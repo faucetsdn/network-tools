@@ -1,17 +1,21 @@
-FROM alpine:3.12
+# TODO remove after network-tools release
+# hadolint ignore=DL3007
+FROM iqtlabs/rbqwrapper:latest
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
+ENV DEBIAN_FRONTEND noninteractive
+ENV PYTHONUNBUFFERED 1
+
 # Install packages
-RUN apk update && \
-    apk add bash jansson libpcap gcc libxml2-dev libxslt-dev linux-headers musl-dev procps python3 python3-dev py3-pip tshark && \
-    apk add p0f --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing && \
-    rm -rf /root/* && \
-    rm -rf /var/cache/apk/*
+# hadolint ignore=DL3008
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc libxml2-dev libxslt-dev python3-dev tshark p0f && \
+    rm -rf /var/cache/* && \
+    rm -rf /root/.cache/*
 
 COPY . /app
 WORKDIR /app
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT ["python3", "app.py"]
-CMD [""]
+ENTRYPOINT ["/rbqwrapper.py", "python3", "/app/app.py"]

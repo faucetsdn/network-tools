@@ -1,4 +1,3 @@
-import datetime
 import ipaddress
 import json
 import logging
@@ -8,24 +7,8 @@ import subprocess
 import sys
 import tempfile
 
-import pika
 import pyshark
 
-
-def connect_rabbit(host='messenger', port=5672, queue='task_queue'):
-    params = pika.ConnectionParameters(host=host, port=port)
-    connection = pika.BlockingConnection(params)
-    channel = connection.channel()
-    channel.queue_declare(queue=queue, durable=True)
-    return (connection, channel)
-
-def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
-    channel.basic_publish(exchange=exchange,
-                          routing_key=routing_key,
-                          body=json.dumps(msg),
-                          properties=pika.BasicProperties(delivery_mode=2))
-    print(" [X] %s UTC %r %r" % (str(datetime.datetime.utcnow()),
-                                 str(msg['id']), str(msg['file_path'])))
 
 def get_version():
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'VERSION'), 'r') as f:
@@ -38,9 +21,9 @@ def run_proc(args, output=subprocess.DEVNULL):
 def run_p0f(path):
     with tempfile.TemporaryDirectory() as tempdir:
         p0f = shutil.which('p0f')
-        # p0f not in PATH, default to alpine location.
+        # p0f not in PATH, default to ubuntu location.
         if p0f is None:
-            p0f = '/usr/bin/p0f'
+            p0f = '/usr/sbin/p0f'
         p0f_output = os.path.join(tempdir, 'p0f_output.txt')
         args = [p0f, '-r', path, '-o', p0f_output]
         run_proc(args)
@@ -113,9 +96,30 @@ def ispcap(pathfile):
             return True
     return False
 
+def build_result_json(pcap_paths):
+    ipv4_addresses = {}
+    ipv6_addresses = {}
+
+    for path in pcap_paths:
+        p0f_output = run_p0f(path)
+        addresses = run_tshark(path)
+        results = parse_output(p0f_output, addresses)
+        for ip, metadata in results.items():
+            if metadata:
+                ipv = ipaddress.ip_address(ip).version
+                if ipv == 4:
+                    ipv4_addresses[ip] = metadata
+                else:
+                    ipv6_addresses[ip] = metadata
+
+    return {
+        'tool': 'p0f',
+        'data': {'ipv4_addresses': ipv4_addresses, 'ipv6_addresses': ipv6_addresses},
+    }
+
+
 def main():
     logging.basicConfig(level=logging.DEBUG)
-    logger = logging.getLogger(__name__)
     pcap_paths = []
     path = sys.argv[1]
     if os.path.isdir(path):
@@ -126,33 +130,10 @@ def main():
     else:
         pcap_paths.append(path)
 
-
-    for path in pcap_paths:
-        p0f_output = run_p0f(path)
-        addresses = run_tshark(path)
-        results = parse_output(p0f_output, addresses)
-        print(results)
-
-        if os.environ.get('rabbit', '') == 'true':
-            uid = os.environ.get('id', '')
-            version = get_version()
-            queue = os.getenv('RABBIT_QUEUE_NAME', 'task_queue')
-            routing_key = os.getenv('RABBIT_ROUTING_KEY', 'task_queue')
-            exchange = os.getenv('RABBIT_EXCHANGE', 'task_queue')
-            try:
-                connection, channel = connect_rabbit(queue=queue)
-                body = {
-                    'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {
-                        'tool': 'p0f', 'version': version}}
-                send_rabbit_msg(body, channel, exchange=exchange, routing_key=routing_key)
-                if path == pcap_paths[-1]:
-                    body = {
-                        'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {
-                            'tool': 'p0f', 'version': version}}
-                    send_rabbit_msg(body, channel)
-                connection.close()
-            except Exception as e:
-                print(str(e))
+    result_json = build_result_json(pcap_paths)
+    result_path = os.getenv('RESULT_PATH', 'result.json')
+    with open(result_path, 'w') as f:
+        f.write(json.dumps(result_json))
 
 
 if __name__ == "__main__":  # pragma: no cover

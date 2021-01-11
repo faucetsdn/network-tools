@@ -1,2 +1,2 @@
-pika==1.1.0
 pyshark==0.4.2.11
+pytest==6.2.1
