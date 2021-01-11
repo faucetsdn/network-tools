@@ -13,29 +13,25 @@ from .app import ispcap
 from .app import main
 from .app import run_tshark
 from .app import run_p0f
+from .app import build_result_json
 
 
 TEST_LO_CAP = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'test_lo.cap')
 
 
 def test_ispcap():
-    assert ispcap('afile.pcap')
-    assert not ispcap('notapcap.txt')
+    assert ispcap('afile.pcap')  # nosec
+    assert not ispcap('notapcap.txt')  # nosec
 
 
 def test_version():
-    assert get_version() == '0.11.18.dev'
+    assert get_version().startswith('0.')  # nosec
 
 
-def test_parse_output():
-    p0f_output = run_p0f(TEST_LO_CAP)
-    src_addresses = run_tshark(TEST_LO_CAP)
-    result = parse_output(p0f_output, src_addresses)
-    assert {
-        '127.0.0.1': {
-            'full_os': 'Linux 2.2.x-3.x', 'short_os': 'Linux', 'raw_mtu': '65535', 'mac': '00:00:00:00:00:00'},
-        '::1': {
-            'raw_mtu': '65536', 'mac': '00:00:00:00:00:00'}} == result
+def test_result_json():
+    assert build_result_json([TEST_LO_CAP]) == {'data': {  # nosec
+        'ipv4_addresses': {'127.0.0.1': {'full_os': 'Linux 2.2.x-3.x', 'mac': '00:00:00:00:00:00', 'raw_mtu': '65535', 'short_os': 'Linux'}},
+        'ipv6_addresses': {'::1': {'mac': '00:00:00:00:00:00', 'raw_mtu': '65536'}}}, 'tool': 'p0f'}
 
 
 def test_main():
