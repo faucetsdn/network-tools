@@ -21,7 +21,7 @@ jobs:
         export PATH=/home/runner/.local/bin:$PATH && \
         make test && \
         coverage report && coverage xml && \
-        sudo ./network_tap/ncapture/test_ncapture.sh
+        cd network_tap/ncapture && sudo ./test_ncapture.sh
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1.2.1
       env:
