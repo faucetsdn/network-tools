@@ -7,6 +7,7 @@ COPY healthcheck /healthcheck
 RUN apk add --update \
     curl \
     gcc \
+    g++ \
     git \
     linux-headers \
     musl-dev \
@@ -17,6 +18,7 @@ RUN apk add --update \
     && pip3 install --no-cache-dir -r /healthcheck/requirements.txt \
     && apk del \
     gcc \
+    g++ \
     git \
     linux-headers \
     musl-dev \
