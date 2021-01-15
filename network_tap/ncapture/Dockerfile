@@ -1,4 +1,4 @@
-FROM alpine:3.12
+FROM alpine:3.13
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 ENV BUILDDEPS="autoconf automake bison build-base flex gcc git libtool libpcap-dev libpcap linux-headers musl-dev python3-dev yaml-dev"
