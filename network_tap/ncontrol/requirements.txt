@@ -1,5 +1,5 @@
 docker==4.4.1
 falcon==2.0.0
 falcon-cors==1.1.7
-gevent==1.4.0
+gevent==21.1.1
 gunicorn==20.0.4
