@@ -1,2 +1,2 @@
 #!/bin/sh
-gunicorn -b :8080 -k gevent -w 4 --reload ncontrol.ncontrol
+gunicorn -b :8080 -k eventlet -w 4 --reload ncontrol.ncontrol
