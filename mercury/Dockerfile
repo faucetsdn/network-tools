@@ -5,6 +5,7 @@ COPY requirements.txt requirements.txt
 
 # Install packages
 RUN apk add --update \
+    cargo \
     gcc \
     linux-headers \
     libffi-dev \
@@ -16,6 +17,7 @@ RUN apk add --update \
     py3-pip \
     && pip3 install --no-cache-dir -r requirements.txt \
     && apk del \
+    cargo \
     gcc \
     libffi-dev \
     openssl-dev \
