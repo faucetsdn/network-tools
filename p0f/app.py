@@ -116,7 +116,7 @@ def build_result_json(pcap_paths):
         all_results.append({
             'tool': 'p0f',
             'version': get_version(),
-            'id': uid = os.environ.get('id', ''),
+            'id': os.environ.get('id', ''),
             'type': 'metadata',
             'file_path': path,
             'results': {'tool': 'p0f', 'version': get_version()},
