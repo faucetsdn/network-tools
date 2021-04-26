@@ -5,7 +5,7 @@ from .routes import routes
 
 
 cors = CORS(allow_all_origins=True)
-api = application = falcon.API(middleware=[cors.middleware])
+api = application = falcon.App(middleware=[cors.middleware])
 
 r = routes()
 for route in r:

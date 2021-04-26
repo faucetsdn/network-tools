@@ -26,10 +26,10 @@ class CreateR(object):
             try:
                 payload = json.load(req.stream)
             except Exception as e:  # pragma: no cover
-                resp.body = "(False, 'malformed payload')"
+                resp.text = "(False, 'malformed payload')"
                 return
         else:
-            resp.body = "(False, 'malformed payload')"
+            resp.text = "(False, 'malformed payload')"
             return
 
         if 'filter' not in payload:
@@ -49,16 +49,16 @@ class CreateR(object):
 
         # verify payload has necessary information
         if 'nic' not in payload:
-            resp.body = "(False, 'payload missing nic')"
+            resp.text = "(False, 'payload missing nic')"
             return
         if 'id' not in payload:
-            resp.body = "(False, 'payload missing id')"
+            resp.text = "(False, 'payload missing id')"
             return
         if 'interval' not in payload:
-            resp.body = "(False, 'payload missing interval')"
+            resp.text = "(False, 'payload missing interval')"
             return
         if 'iters' not in payload:
-            resp.body = "(False, 'payload missing iters')"
+            resp.text = "(False, 'payload missing iters')"
             return
 
         # connect to docker
@@ -66,7 +66,7 @@ class CreateR(object):
         try:
             c = docker.from_env()
         except Exception as e:  # pragma: no cover
-            resp.body = "(False, 'unable to connect to docker because: " + str(e) + "')"
+            resp.text = "(False, 'unable to connect to docker because: " + str(e) + "')"
             return
 
         # spin up container with payload specifications
@@ -85,11 +85,11 @@ class CreateR(object):
             try:
                 container = c.containers.run(image='iqtlabs/ncapture:v0.11.21',
                                              command=cmd, remove=remove, detach=True, **tool_d)
-                resp.body = "(True, 'successfully created and started filter: " + \
+                resp.text = "(True, 'successfully created and started filter: " + \
                     str(payload['id']) + ' on container: ' + \
                     str(container.id) + "')"
             except Exception as e:  # pragma: no cover
-                resp.body = "(False, 'unable to start container because: " + str(e) + "')"
+                resp.text = "(False, 'unable to start container because: " + str(e) + "')"
                 return
 
         return
@@ -115,15 +115,15 @@ class DeleteR(object):
             try:
                 payload = json.load(req.stream)
             except Exception as e:  # pragma: no cover
-                resp.body = "(False, 'malformed payload')"
+                resp.text = "(False, 'malformed payload')"
                 return
         else:
-            resp.body = "(False, 'malformed payload')"
+            resp.text = "(False, 'malformed payload')"
             return
 
         # verify payload has a container ID
         if 'id' not in payload:
-            resp.body = "(False, 'payload missing id')"
+            resp.text = "(False, 'payload missing id')"
             return
 
         # connect to docker and stop the given container
@@ -131,7 +131,7 @@ class DeleteR(object):
         try:
             c = docker.from_env()
         except Exception as e:  # pragma: no cover
-            resp.body = "(False, 'unable to connect to docker because: " + str(e) + "')"
+            resp.text = "(False, 'unable to connect to docker because: " + str(e) + "')"
             return
 
         # delete containers chosen from CLI
@@ -139,10 +139,10 @@ class DeleteR(object):
             for container_id in payload['id']:
                 c.containers.get(container_id).remove()
         except Exception as e:  # pragma: no cover
-            resp.body = "(False, 'unable to delete containers because: " + str(e) + "')"
+            resp.text = "(False, 'unable to delete containers because: " + str(e) + "')"
             return
 
-        resp.body = '(True, ' + str(payload['id']) + ')'
+        resp.text = '(True, ' + str(payload['id']) + ')'
         return
 
 
@@ -156,7 +156,7 @@ class InfoR(object):
             version = open('VERSION', 'r').read().strip()
         except Exception as e:  # pragma: no cover
             version = str(e)
-        resp.body = json.dumps({'version': version})
+        resp.text = json.dumps({'version': version})
         resp.content_type = falcon.MEDIA_TEXT
         resp.status = falcon.HTTP_200
         return
@@ -178,7 +178,7 @@ class ListR(object):
         try:
             containers = docker.from_env()
         except Exception as e:  # pragma: no cover
-            resp.body = "(False, 'unable to connect to docker because: " + str(e) + "')"
+            resp.text = "(False, 'unable to connect to docker because: " + str(e) + "')"
             return
 
         # search for all docker containers and grab ncapture containers
@@ -194,10 +194,10 @@ class ListR(object):
                     lst['args'] = c.attrs['Args']
                     container_list.append(lst)
         except Exception as e:  # pragma: no cover
-            resp.body = "(False, 'Failure because: " + str(e) + "')"
+            resp.text = "(False, 'Failure because: " + str(e) + "')"
             return
 
-        resp.body = json.dumps(container_list)
+        resp.text = json.dumps(container_list)
         return
 
 
@@ -221,15 +221,15 @@ class StartR(object):
             try:
                 payload = json.load(req.stream)
             except Exception as e:  # pragma: no cover
-                resp.body = "(False, 'malformed payload')"
+                resp.text = "(False, 'malformed payload')"
                 return
         else:
-            resp.body = "(False, 'malformed payload')"
+            resp.text = "(False, 'malformed payload')"
             return
 
         # verify payload has a container ID
         if 'id' not in payload:
-            resp.body = "(False, 'payload missing container id')"
+            resp.text = "(False, 'payload missing container id')"
             return
 
         # connect to docker and stop the given container
@@ -237,7 +237,7 @@ class StartR(object):
         try:
             c = docker.from_env()
         except Exception as e:  # pragma: no cover
-            resp.body = "(False, 'unable to connect to docker because: " + str(e) + "')"
+            resp.text = "(False, 'unable to connect to docker because: " + str(e) + "')"
             return
 
         # start containers chosen from CLI
@@ -245,10 +245,10 @@ class StartR(object):
             for container_id in payload['id']:
                 c.containers.get(container_id).start()
         except Exception as e:  # pragma: no cover
-            resp.body = "(False, 'unable to start list of containers because: " + str(e) + "')"
+            resp.text = "(False, 'unable to start list of containers because: " + str(e) + "')"
             return
 
-        resp.body = '(True, ' + str(payload['id']) + ')'
+        resp.text = '(True, ' + str(payload['id']) + ')'
         return
 
 
@@ -272,15 +272,15 @@ class StopR(object):
             try:
                 payload = json.load(req.stream)
             except Exception as e:  # pragma: no cover
-                resp.body = "(False, 'malformed payload')"
+                resp.text = "(False, 'malformed payload')"
                 return
         else:
-            resp.body = "(False, 'malformed payload')"
+            resp.text = "(False, 'malformed payload')"
             return
 
         # verify payload has a container ID
         if 'id' not in payload:
-            resp.body = "(False, 'payload missing container id')"
+            resp.text = "(False, 'payload missing container id')"
             return
 
         # connect to docker and stop the given container
@@ -288,7 +288,7 @@ class StopR(object):
         try:
             c = docker.from_env()
         except Exception as e:  # pragma: no cover
-            resp.body = "(False, 'unable to connect to docker because: " + str(e) + "')"
+            resp.text = "(False, 'unable to connect to docker because: " + str(e) + "')"
             return
 
         # stop containers chosen from CLI
@@ -296,8 +296,8 @@ class StopR(object):
             for container_id in payload['id']:
                 c.containers.get(container_id).stop()
         except Exception as e:  # pragma: no cover
-            resp.body = "(False, 'unable to stop list of containers because: " + str(e) + "')"
+            resp.text = "(False, 'unable to stop list of containers because: " + str(e) + "')"
             return
 
-        resp.body = '(True, ' + str(payload['id']) + ')'
+        resp.text = '(True, ' + str(payload['id']) + ')'
         return
