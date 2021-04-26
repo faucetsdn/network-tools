@@ -99,6 +99,7 @@ def ispcap(pathfile):
 def build_result_json(pcap_paths):
     ipv4_addresses = {}
     ipv6_addresses = {}
+    all_results = []
 
     for path in pcap_paths:
         p0f_output = run_p0f(path)
@@ -112,11 +113,16 @@ def build_result_json(pcap_paths):
                 else:
                     ipv6_addresses[ip] = metadata
 
-    return {
-        'tool': 'p0f',
-        'data': {'ipv4_addresses': ipv4_addresses, 'ipv6_addresses': ipv6_addresses},
-    }
-
+        all_results.append({
+            'tool': 'p0f',
+            'version': get_version(),
+            'id': uid = os.environ.get('id', ''),
+            'type': 'metadata',
+            'file_path': path,
+            'results': {'tool': 'p0f', 'version': get_version()},
+            'data': {'ipv4_addresses': ipv4_addresses, 'ipv6_addresses': ipv6_addresses},
+        })
+    return all_results
 
 def main():
     logging.basicConfig(level=logging.DEBUG)
