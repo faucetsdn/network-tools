@@ -29,13 +29,13 @@ def test_version():
 
 
 def test_result_json():
-    assert build_result_json([TEST_LO_CAP]) == {'data': {  # nosec
+    assert build_result_json([TEST_LO_CAP]) == ['data': {  # nosec
         'ipv4_addresses': {'127.0.0.1': {'full_os': 'Linux 2.2.x-3.x', 'mac': '00:00:00:00:00:00', 'raw_mtu': '65535', 'short_os': 'Linux'}},
-        'ipv6_addresses': {'::1': {'mac': '00:00:00:00:00:00', 'raw_mtu': '65536'}}},
+        'ipv6_addresses': {'::1': {'mac': '00:00:00:00:00:00', 'raw_mtu': '65536'}},
         'file_path': '/home/runner/work/network-tools/network-tools/p0f/test_lo.cap',
         'id': '',
         'results': {'tool': 'p0f', 'version': '0.11.22.dev'}, 'tool': 'p0f',
-        'type': 'metadata', 'version': '0.11.22.dev'}
+        'type': 'metadata', 'version': '0.11.22.dev'}]
 
 
 def test_main():
