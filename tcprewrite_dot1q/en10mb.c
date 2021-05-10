@@ -30,7 +30,7 @@
 #include "en10mb.h"
 
 
-static char _U_ dlt_name[] = "en10mb";
+static char dlt_name[] = "en10mb";
 static char dlt_prefix[] = "enet";
 static uint16_t dlt_value = DLT_EN10MB;
 
@@ -104,8 +104,17 @@ dlt_en10mb_init(tcpeditdlt_t *ctx)
         return TCPEDIT_ERROR;
     }
     
-    ctx->decoded_extra_size = sizeof(en10mb_extra_t);
-    ctx->decoded_extra = safe_malloc(ctx->decoded_extra_size);
+    if (ctx->decoded_extra_size > 0) {
+        if (ctx->decoded_extra_size < sizeof(en10mb_extra_t)) {
+            ctx->decoded_extra_size = sizeof(en10mb_extra_t);
+            ctx->decoded_extra = safe_realloc(ctx->decoded_extra,
+                                              ctx->decoded_extra_size);
+        }
+    } else {
+        ctx->decoded_extra_size = sizeof(en10mb_extra_t);
+        ctx->decoded_extra = safe_malloc(ctx->decoded_extra_size);
+    }
+
     plugin->config_size = sizeof(en10mb_config_t);
     plugin->config = safe_malloc(plugin->config_size);
     config = (en10mb_config_t *)plugin->config;
@@ -128,24 +137,25 @@ int
 dlt_en10mb_cleanup(tcpeditdlt_t *ctx)
 {
     tcpeditdlt_plugin_t *plugin;
-    
-    assert(ctx);
-    
-    if ((plugin = tcpedit_dlt_getplugin(ctx, dlt_value)) == NULL)
-        return TCPEDIT_OK;
 
-    if (ctx->decoded_extra != NULL) {
-        safe_free(ctx->decoded_extra);
-        ctx->decoded_extra = NULL;
-        ctx->decoded_extra_size = 0;
+    assert(ctx);
+
+    if ((plugin = tcpedit_dlt_getplugin(ctx, dlt_value)) == NULL) {
+        tcpedit_seterr(ctx->tcpedit, "Unable to cleanup unregistered plugin %s",
+                       dlt_name);
+        return TCPEDIT_ERROR;
     }
 
+    safe_free(plugin->name);
+    plugin->name = NULL;
     if (plugin->config != NULL) {
+        en10mb_config_t *config = (en10mb_config_t*)plugin->config;
+        safe_free(config->subs.entries);
         safe_free(plugin->config);
         plugin->config = NULL;
         plugin->config_size = 0;
     }
-        
+
     return TCPEDIT_OK; /* success */
 }
 
@@ -164,14 +174,16 @@ en10mb_sub_entry_t *
 dlt_en10mb_realloc_merge(en10mb_sub_conf_t config, en10mb_sub_entry_t *new_entries, int entries_count)
 {
     int i;
-    en10mb_sub_entry_t *merged = safe_realloc(
-        config.entries, (config.count + entries_count) * sizeof(en10mb_sub_entry_t));
+
+    config.entries = safe_realloc(config.entries,
+                                  (config.count + entries_count)
+                                  * sizeof(en10mb_sub_entry_t));
 
     for (i = 0; i < entries_count; i++) {
-        merged[config.count + i] = new_entries[i];
+        config.entries[config.count + i] = new_entries[i];
     }
 
-    return merged;
+    return config.entries;
 }
 
 int
@@ -440,6 +452,14 @@ dlt_en10mb_encode(tcpeditdlt_t *ctx, u_char *packet, int pktlen, tcpr_dir_t dir)
     assert(ctx);
     assert(packet);
 
+    /*
+    if (pktlen < TCPR_802_1Q_H) {
+        tcpedit_seterr(ctx->tcpedit, 
+                "Unable to process packet #" COUNTER_SPEC " since it is less then 14 bytes.", 
+                ctx->tcpedit->runtime.packetnum);
+        return TCPEDIT_ERROR;
+    }*/
+
     plugin = tcpedit_dlt_getplugin(ctx, dlt_value);
     if (!plugin)
         return TCPEDIT_ERROR;
@@ -663,8 +683,11 @@ dlt_en10mb_proto(tcpeditdlt_t *ctx, const u_char *packet, const int pktlen)
     
     assert(ctx);
     assert(packet);
-    if (pktlen < (int) sizeof(*eth))
+    if (pktlen < (int) sizeof(*eth)) {
+        tcpedit_seterr(ctx->tcpedit, "Ethernet packet length too short: %d",
+                pktlen);
         return TCPEDIT_ERROR;
+    }
     
     eth = (struct tcpr_ethernet_hdr *)packet;
     switch (ntohs(eth->ether_type)) {
@@ -677,6 +700,7 @@ dlt_en10mb_proto(tcpeditdlt_t *ctx, const u_char *packet, const int pktlen)
             return eth->ether_type;
             break;
     }
+
     return TCPEDIT_ERROR;
 }
 
@@ -764,24 +788,29 @@ dlt_en10mb_l2len(tcpeditdlt_t *ctx, const u_char *packet, const int pktlen)
     if (pktlen < l2len)
         return -1;
 
-    ether_type = ntohs(((eth_hdr_t*)(packet + l2len))->ether_type);
+    ether_type = ntohs(((eth_hdr_t*)packet)->ether_type);
     while (ether_type == ETHERTYPE_VLAN) {
-        vlan_hdr_t *vlan_hdr = (vlan_hdr_t *)(packet + l2len);
-        ether_type = ntohs(vlan_hdr->vlan_len);
-        l2len += 4;
+        if (pktlen < l2len + (int)sizeof(vlan_hdr_t))
+             return -1;
+
+         vlan_hdr_t *vlan_hdr = (vlan_hdr_t*)(packet + l2len);
+         ether_type = ntohs(vlan_hdr->vlan_tpid);
+         l2len += 4;
     }
 
     if (l2len > 0) {
         if (pktlen < l2len) {
             /* can happen if fuzzing is enabled */
+            tcpedit_seterr(ctx->tcpedit, "dlt_en10mb_l2len: pktlen=%u is less than l2len=%u",
+                    pktlen, l2len);
             return -1;
         }
 
         return l2len;
     }
 
-    tcpedit_seterr(ctx->tcpedit, "%s", "Whoops!  Bug in my code!");
-    return -1;
+    tcpedit_seterr(ctx->tcpedit, "dlt_en10mb_l2len: %s", "Whoops!  Bug in my code!");
+    return TCPEDIT_ERROR;
 }
 
 tcpeditdlt_l2addr_type_t
