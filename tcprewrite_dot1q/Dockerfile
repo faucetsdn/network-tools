@@ -17,10 +17,10 @@ RUN apk update && \
 RUN pip3 install -r requirements.txt
 COPY tcprewrite.py tcprewrite.py
 
-RUN curl -L https://github.com/appneta/tcpreplay/releases/download/v4.3.2/tcpreplay-4.3.2.tar.gz -o tcpreplay-4.3.2.tar.gz
-RUN tar -xf tcpreplay-4.3.2.tar.gz
-RUN cp en10mb.c tcpreplay-4.3.2/src/tcpedit/plugins/dlt_en10mb/en10mb.c
-RUN cd tcpreplay-4.3.2 && \
+RUN curl -L https://github.com/appneta/tcpreplay/releases/download/v4.3.4/tcpreplay-4.3.4.tar.gz -o tcpreplay-4.3.4.tar.gz
+RUN tar -xf tcpreplay-4.3.4.tar.gz
+RUN cp en10mb.c tcpreplay-4.3.4/src/tcpedit/plugins/dlt_en10mb/en10mb.c
+RUN cd tcpreplay-4.3.4 && \
     if ! ./configure; then cat config.log; exit 1; fi && \
     make && \
     make install
