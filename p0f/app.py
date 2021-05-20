@@ -97,11 +97,11 @@ def ispcap(pathfile):
     return False
 
 def build_result_json(pcap_paths):
-    ipv4_addresses = {}
-    ipv6_addresses = {}
     all_results = []
 
     for path in pcap_paths:
+        ipv4_addresses = {}
+        ipv6_addresses = {}
         p0f_output = run_p0f(path)
         addresses = run_tshark(path)
         results = parse_output(p0f_output, addresses)
@@ -120,8 +120,11 @@ def build_result_json(pcap_paths):
             'type': 'metadata',
             'file_path': path,
             'results': {'tool': 'p0f', 'version': get_version()},
-            'data': {'ipv4_addresses': ipv4_addresses, 'ipv6_addresses': ipv6_addresses},
+            'data': {'file_path': path, 'ipv4_addresses': ipv4_addresses, 'ipv6_addresses': ipv6_addresses},
         })
+    # final record without data to indicate it's done
+    all_results.append({'tool': 'p0f', 'id': os.environ.get('id', ''), 'type': 'metadata', 'file_path': pcap_paths[0], 'data': '', 'results': {'tool': 'p0f', 'version': get_version()}})
+
     return all_results
 
 def main():

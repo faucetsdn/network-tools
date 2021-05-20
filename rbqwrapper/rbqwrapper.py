@@ -64,20 +64,26 @@ class RbqWrapper:
         self.logger.info('_send_rabbit_msg: %s', body)
 
     def _validate_results(self, results):
+        if isinstance(results, dict):
+            results = [results]
         for required_field in ('tool', 'data'):
-            if required_field not in results:
-                self.logger.error('results are missing field %s', required_field)
-                return False
-        data = results.get('data', None)
-        if not isinstance(data, dict):
-            self.logger.error('results data must be a dict')
-            return False
-        for required_metadata_field in ('mac_addresses', 'ipv4_addresses', 'ipv6_addresses'):
-            required_metadata = data.get(required_metadata_field, None)
-            if isinstance(required_metadata, dict):
-                return True
-        self.logger.error('required metadata field not present')
-        return False
+            for result in results:
+                if required_field not in result:
+                    self.logger.error('results are missing field %s', required_field)
+                    return False
+        for result in results:
+            data = result.get('data', None)
+            if data != "":
+                if not isinstance(data, dict):
+                    self.logger.error('results data must be a dict')
+                    return False
+                for required_metadata_field in ('mac_addresses', 'ipv4_addresses', 'ipv6_addresses'):
+                    required_metadata = data.get(required_metadata_field, None)
+                    self.logger.info(required_metadata)
+                    if required_metadata and not isinstance(required_metadata, dict):
+                        self.logger.error('results have an incorrect datatype, %s should be a dict', required_metadata)
+                        return False
+        return True
 
     def output_msg(self):
         try:
@@ -91,7 +97,8 @@ class RbqWrapper:
             return
         try:
             (connection, channel) = self._connect_rabbit()
-            self._send_rabbit_msg(results, channel)
+            for result in results:
+                self._send_rabbit_msg(result, channel)
             connection.close()
         except (socket.gaierror, pika.exceptions.AMQPConnectionError) as err:
             self.logger.error('Failed to send Rabbit message %s because: %s', results, err)
