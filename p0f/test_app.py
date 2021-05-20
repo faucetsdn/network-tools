@@ -35,14 +35,14 @@ def test_result_json():
         'ipv6_addresses': {'::1': {'mac': '00:00:00:00:00:00', 'raw_mtu': '65536'}}},
         'file_path': '/home/runner/work/network-tools/network-tools/p0f/test_lo.cap',
         'id': '',
-        'results': {'tool': 'p0f', 'version': '0.11.22.dev'}, 'tool': 'p0f',
-        'type': 'metadata', 'version': '0.11.22.dev'},
+        'results': {'tool': 'p0f', 'version': '0.11.22'}, 'tool': 'p0f',
+        'type': 'metadata', 'version': '0.11.22'},
     {
         'data': '',
         'file_path': '/home/runner/work/network-tools/network-tools/p0f/test_lo.cap',
         'id': '',
         'results': {'tool': 'p0f',
-        'version': '0.11.22.dev'},
+        'version': '0.11.22'},
         'tool': 'p0f',
         'type': 'metadata'}]
 
