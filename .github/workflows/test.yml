@@ -23,5 +23,5 @@ jobs:
         coverage report && coverage xml && \
         cd network_tap/ncapture && sudo ./test_ncapture.sh
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1.5.0
+      uses: codecov/codecov-action@v1.5.2
       if: github.repository == 'iqtlabs/network-tools'
