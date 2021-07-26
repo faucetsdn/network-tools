@@ -16,6 +16,9 @@ import pika
 
 from enchant.tokenize import get_tokenizer
 from scapy.all import *
+import network_tools_lib
+
+VERSION = network_tools_lib.get_version()
 
 
 def striptxt_pcap(pcap):
@@ -92,13 +95,6 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
     print(" [X] %s UTC %r %r" % (str(datetime.utcnow()),
                                  str(msg['id']), str(msg['file_path'])))
     return
-
-def get_version():
-    version = ''
-    with open('VERSION', 'r') as f:
-        for line in f:
-            version = line.strip()
-    return version
 
 def get_path():
     path = None
@@ -364,15 +360,15 @@ if __name__ == '__main__':  # pragma: no cover
             try:
                 channel = connect_rabbit()
                 capinfos_results = run_capinfos(path)
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': capinfos_results, 'results': {'tool': 'pcap-stats', 'version': get_version()}}
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': capinfos_results, 'results': {'tool': 'pcap-stats', 'version': VERSION}}
                 send_rabbit_msg(body, channel)
                 tshark_results = run_tshark(path)
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': tshark_results, 'results': {'tool': 'pcap-stats', 'version': get_version()}}
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': tshark_results, 'results': {'tool': 'pcap-stats', 'version': VERSION}}
                 send_rabbit_msg(body, channel)
                 text_results = striptxt_pcap(path)
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': text_results, 'results': {'tool': 'pcap-stats', 'version': get_version()}}
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': text_results, 'results': {'tool': 'pcap-stats', 'version': VERSION}}
                 send_rabbit_msg(body, channel)
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'pcap-stats', 'version': get_version()}}
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'pcap-stats', 'version': VERSION}}
                 send_rabbit_msg(body, channel)
             except Exception as e:
                 print(str(e))

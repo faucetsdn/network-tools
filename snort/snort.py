@@ -13,6 +13,9 @@ import subprocess
 import sys
 
 import pika
+import network_tools_lib
+
+VERSION = network_tools_lib.get_version()
 
 
 def connect_rabbit(host='messenger', port=5672, queue='task_queue'):
@@ -32,13 +35,6 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
     print(" [X] %s UTC %r %r" % (str(datetime.datetime.utcnow()),
                                  str(msg['id']), str(msg['file_path'])))
     return
-
-def get_version():
-    version = ''
-    with open('VERSION', 'r') as f:
-        for line in f:
-            version = line.strip()
-    return version
 
 def get_path():
     path = None
@@ -113,11 +109,11 @@ if __name__ == '__main__':  # pragma: no cover
         if 'rabbit' in os.environ and os.environ['rabbit'] == 'true':
             try:
                 channel = connect_rabbit()
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'snort', 'version': get_version()}}
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {'tool': 'snort', 'version': VERSION}}
                 send_rabbit_msg(body, channel)
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': alerts, 'results': {'tool': 'snort', 'version': get_version()}}
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': alerts, 'results': {'tool': 'snort', 'version': VERSION}}
                 send_rabbit_msg(body, channel)
-                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'snort', 'version': get_version()}}
+                body = {'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {'tool': 'snort', 'version': VERSION}}
                 send_rabbit_msg(body, channel)
             except Exception as e:
                 print(str(e))

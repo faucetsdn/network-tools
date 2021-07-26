@@ -78,7 +78,7 @@ jobs:
       run: |
         for N in ${{ steps.get_images.outputs.NAMES }}
         do
-          docker build ${N}
+          docker build -f ${N}/Dockerfile .
         done
       if: steps.docker.outputs.PUSH_TO_DOCKER == 'false'
     - name: Set up qemu
@@ -107,7 +107,7 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm/v7,linux/arm64 \
             --push \
-            -t ${TAGGED_IMAGE} ${N}
+            -t ${TAGGED_IMAGE} -f ${N}/Dockerfile .
         done
       if: success() && (steps.docker.outputs.PUSH_TO_DOCKER == 'true')
     - name: List available tags for images

@@ -1,9 +1,13 @@
+# TODO: requires python3.8
 FROM alpine:3.13
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
-COPY requirements.txt requirements.txt
+ENV DEBIAN_FRONTEND noninteractive
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONPATH=/app/network_tools_lib
 
-# Install packages
+WORKDIR /app
+COPY mercury/requirements.txt /app/requirements.txt
 RUN apk add --update \
     cargo \
     gcc \
@@ -15,7 +19,7 @@ RUN apk add --update \
     python3 \
     python3-dev \
     py3-pip \
-    && pip3 install --no-cache-dir -r requirements.txt \
+    && pip3 install --no-cache-dir -r /app/requirements.txt \
     && apk del \
     cargo \
     gcc \
@@ -24,9 +28,9 @@ RUN apk add --update \
     python3-dev \
     && rm -rf /var/cache/apk/*
 
-COPY . /app
-WORKDIR /app
+COPY mercury/ /app
+COPY network_tools_lib/ /app/network_tools_lib
+RUN python3 /app/app.py
 
-ENV PYTHONUNBUFFERED 1
-ENTRYPOINT ["python3", "app.py"]
+ENTRYPOINT ["python3", "/app/app.py"]
 CMD [""]

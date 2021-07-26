@@ -10,6 +10,9 @@ import json
 import os
 
 import pika
+import network_tools_lib
+
+VERSION = network_tools_lib.get_version()
 
 
 def connect_rabbit(host='messenger', port=5672, queue='task_queue'):
@@ -27,14 +30,6 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
                           properties=pika.BasicProperties(delivery_mode=2,))
     print(' [X] %s UTC %r %r' % (str(datetime.datetime.utcnow()),
                                  str(msg['id']), str(msg['file_path'])))
-
-
-def get_version():
-    version = ''
-    with open('VERSION', 'r') as f:
-        for line in f:
-            version = line.strip()
-    return version
 
 
 def get_path(paths):
@@ -67,7 +62,7 @@ if __name__ == '__main__':  # pragma: no cover
             channel = connect_rabbit(host=external_host)
             body = {'id': uid, 'type': 'metadata', 'file_path': path,
                     'data': '', 'file_type': 'pcap_strip',
-                    'results': {'tool': 'ncapture', 'version': get_version()}}
+                    'results': {'tool': 'ncapture', 'version': VERSION}}
             send_rabbit_msg(body, channel)
         except Exception as e:
             print(str(e))

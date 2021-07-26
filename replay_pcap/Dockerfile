@@ -6,7 +6,7 @@ RUN apt-get -y update && apt-get install -y --no-install-recommends \
     sudo \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-COPY replay.sh .
+COPY replay_pcap/replay.sh /app/replay.sh
 
-ENTRYPOINT ["/replay.sh"]
+ENTRYPOINT ["/app/replay.sh"]
 CMD [""]
