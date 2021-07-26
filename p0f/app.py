@@ -49,7 +49,8 @@ def parse_eth(packet):
 def run_tshark(path):
     addresses = set()
     with pyshark.FileCapture(path, include_raw=False, keep_packets=False,
-                             custom_parameters=['-o', 'tcp.desegment_tcp_streams:false']) as cap:
+                             custom_parameters=['-o', 'tcp.desegment_tcp_streams:false',
+                                                '-n', '-j', 'eth ip ipv6']) as cap:  # disable DNS, eth/IP only.
         for packet in cap:
             src_eth_address, dst_eth_address = parse_eth(packet)
             src_address, dst_address = parse_ip(packet)
