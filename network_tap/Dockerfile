@@ -1,8 +1,10 @@
 FROM alpine:3.14
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
-COPY ncontrol/requirements.txt requirements.txt
-COPY healthcheck /healthcheck
+ENV PYTHONPATH=/network-tap/network_tools_lib
+
+COPY network_tap/ncontrol/requirements.txt requirements.txt
+COPY network_tap/healthcheck /healthcheck
 
 RUN apk add --update \
     curl \
@@ -30,7 +32,8 @@ ENV FLASK_APP /healthcheck/hc.py
 HEALTHCHECK --interval=15s --timeout=15s \
  CMD curl --silent --fail http://localhost:5000/healthcheck || exit 1
 
-COPY . /network-tap
+COPY network_tap /network-tap
+COPY network_tools_lib /network-tap/network_tools_lib
 WORKDIR /network-tap
 
 EXPOSE 8080

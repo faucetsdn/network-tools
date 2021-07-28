@@ -7,6 +7,9 @@ import sys
 import tempfile
 
 import pika
+import network_tools_lib
+
+VERSION = network_tools_lib.get_version()
 
 
 def connect_rabbit(host='messenger', port=5672, queue='task_queue'):
@@ -23,10 +26,6 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
                           properties=pika.BasicProperties(delivery_mode=2))
     print(" [X] %s UTC %r %r" % (str(datetime.datetime.utcnow()),
                                  str(msg['id']), str(msg['file_path'])))
-
-def get_version():
-    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'VERSION'), 'r') as f:
-        return f.read().strip()
 
 def run_proc(args, output=subprocess.DEVNULL):
     proc = subprocess.Popen(args, stdout=output)
@@ -54,10 +53,11 @@ def ispcap(pathfile):
     return False
 
 def main():
+    if len(sys.argv) == 1:
+        print('requires path')
+        sys.exit(0)
     pcap_paths = []
     path = sys.argv[1]
-    if path == "":
-        sys.exit(1)
     if os.path.isdir(path):
         for root, _, files in os.walk(path):
             for pathfile in files:
@@ -73,18 +73,17 @@ def main():
 
         if os.environ.get('rabbit', '') == 'true':
             uid = os.environ.get('id', '')
-            version = get_version()
             try:
                 channel = connect_rabbit()
                 if results:
                     body = {
                         'id': uid, 'type': 'metadata', 'file_path': path, 'data': results, 'results': {
-                            'tool': 'mercury', 'version': version}}
+                            'tool': 'mercury', 'version': VERSION}}
                     send_rabbit_msg(body, channel)
                 if path == pcap_paths[-1]:
                     body = {
                         'id': uid, 'type': 'metadata', 'file_path': path, 'data': '', 'results': {
-                            'tool': 'mercury', 'version': version}}
+                            'tool': 'mercury', 'version': VERSION}}
                     send_rabbit_msg(body, channel)
             except Exception as e:
                 print(str(e))

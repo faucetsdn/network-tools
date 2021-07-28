@@ -7,8 +7,8 @@ Created on 7 January 2020
 import os
 import sys
 
+from .app import VERSION
 from .app import parse_output
-from .app import get_version
 from .app import ispcap
 from .app import main
 from .app import run_mercury
@@ -23,7 +23,7 @@ def test_ispcap():
 
 
 def test_version():
-    assert get_version().startswith('0.')  # nosec
+    assert VERSION.startswith('0.')  # nosec
 
 
 def test_parse_output():

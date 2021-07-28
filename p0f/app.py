@@ -8,11 +8,10 @@ import sys
 import tempfile
 
 import pyshark
+import network_tools_lib
 
+VERSION = network_tools_lib.get_version()
 
-def get_version():
-    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'VERSION'), 'r') as f:
-        return f.read().strip()
 
 def run_proc(args, output=subprocess.DEVNULL):
     proc = subprocess.Popen(args, stdout=output)
@@ -116,15 +115,15 @@ def build_result_json(pcap_paths):
 
         all_results.append({
             'tool': 'p0f',
-            'version': get_version(),
+            'version': VERSION,
             'id': os.environ.get('id', ''),
             'type': 'metadata',
             'file_path': path,
-            'results': {'tool': 'p0f', 'version': get_version()},
+            'results': {'tool': 'p0f', 'version': VERSION},
             'data': {'file_path': path, 'ipv4_addresses': ipv4_addresses, 'ipv6_addresses': ipv6_addresses},
         })
     # final record without data to indicate it's done
-    all_results.append({'tool': 'p0f', 'id': os.environ.get('id', ''), 'type': 'metadata', 'file_path': pcap_paths[0], 'data': '', 'results': {'tool': 'p0f', 'version': get_version()}})
+    all_results.append({'tool': 'p0f', 'id': os.environ.get('id', ''), 'type': 'metadata', 'file_path': pcap_paths[0], 'data': '', 'results': {'tool': 'p0f', 'version': VERSION}})
 
     return all_results
 
