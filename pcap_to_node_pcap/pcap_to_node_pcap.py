@@ -91,7 +91,7 @@ def proto_annotate_pcaps(pcap_dir):
     for pcap_filename in pap_filenames:
         try:
             response = subprocess.check_output(shlex.split(' '.join( # nosec
-                ['./tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename])))
+                ['/tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename])))
             pcap_json = json.loads(response.decode('utf-8'))
         except (json.decoder.JSONDecodeError, subprocess.CalledProcessError) as e:
             print(pcap_filename, str(e))
@@ -125,8 +125,8 @@ def get_path(paths):
 
 def run_split(in_path, clients_dir, servers_dir):
     for tool_cmd in (
-            " ".join(("./PcapSplitter -f", in_path, "-o", clients_dir, "-m client-ip")),
-            " ".join(("./PcapSplitter -f", in_path, "-o", servers_dir, "-m server-ip"))):
+            " ".join(("/PcapSplitter -f", in_path, "-o", clients_dir, "-m client-ip")),
+            " ".join(("/PcapSplitter -f", in_path, "-o", servers_dir, "-m server-ip"))):
         try:
             subprocess.check_call(shlex.split(tool_cmd)) # nosec
         except Exception as err:
