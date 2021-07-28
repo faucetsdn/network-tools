@@ -4,9 +4,12 @@ import socket
 
 import docker
 import falcon
+import network_tools_lib
+
+VERSION = network_tools_lib.get_version()
 
 
-class CreateR(object):
+class CreateR:
     """
     This endpoint is for creating a new filter
     """
@@ -83,7 +86,7 @@ class CreateR(object):
             cmd += ' ' + payload['id'] + ' ' + payload['iters'] + ' "'
             cmd += payload['filter'] + '"'
             try:
-                container = c.containers.run(image='iqtlabs/ncapture:v0.11.23',
+                container = c.containers.run(image='iqtlabs/ncapture:v%s' % VERSION,
                                              command=cmd, remove=remove, detach=True, **tool_d)
                 resp.text = "(True, 'successfully created and started filter: " + \
                     str(payload['id']) + ' on container: ' + \
@@ -95,7 +98,7 @@ class CreateR(object):
         return
 
 
-class DeleteR(object):
+class DeleteR:
     """
     This endpoint is for deleting a network tap filter container
     """
@@ -146,23 +149,19 @@ class DeleteR(object):
         return
 
 
-class InfoR(object):
+class InfoR:
     """
     This endpoint is for returning info about this service
     """
 
     def on_get(self, req, resp):
-        try:
-            version = open('VERSION', 'r').read().strip()
-        except Exception as e:  # pragma: no cover
-            version = str(e)
-        resp.text = json.dumps({'version': version})
+        resp.text = json.dumps({'version': VERSION})
         resp.content_type = falcon.MEDIA_TEXT
         resp.status = falcon.HTTP_200
         return
 
 
-class ListR(object):
+class ListR:
     """
     This endpoint is for listing all filter containers
     """
@@ -187,7 +186,7 @@ class ListR(object):
             for c in containers.containers.list(all=True):
                 # TODO: maybe find a way to not have to hard code image name
                 if c.attrs['Config']['Image'] == \
-                        'iqtlabs/ncapture:v0.11.23':
+                        'iqtlabs/ncapture:v%s' % VERSION:
                     lst = {}
                     lst['id'] = c.attrs['Id'][:12]
                     lst['status'] = c.attrs['State']['Status']
@@ -201,7 +200,7 @@ class ListR(object):
         return
 
 
-class StartR(object):
+class StartR:
     """
     This endpoint is for starting a network tap filter container
     """
@@ -252,7 +251,7 @@ class StartR(object):
         return
 
 
-class StopR(object):
+class StopR:
     """
     This endpoint is for stopping a network tap filter container
     """

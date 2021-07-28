@@ -6,7 +6,9 @@ RUN apk add --update \
     tcpdump \
     && rm -rf /var/cache/apk/*
 
-COPY tcpdump_hex_parser.py tcpdump_hex_parser.py
+WORKDIR /app
+COPY tcpdump_hex_parser/tcpdump_hex_parser.py /app/tcpdump_hex_parser.py
+RUN python3 /app/tcpdump_hex_parser.py
 
-ENTRYPOINT ["python", "tcpdump_hex_parser.py"]
+ENTRYPOINT ["python3", "/app/tcpdump_hex_parser.py"]
 CMD [""]

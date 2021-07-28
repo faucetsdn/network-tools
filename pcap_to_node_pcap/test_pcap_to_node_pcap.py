@@ -48,7 +48,7 @@ def test_pcap_name_with_layers():
 
 
 def test_parse_args():
-    args = parse_args(argparse.ArgumentParser([]))
+    args = parse_args(argparse.ArgumentParser(''))
     assert args.protoannotate
 
 

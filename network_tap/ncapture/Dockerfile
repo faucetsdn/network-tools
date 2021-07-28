@@ -2,6 +2,7 @@ FROM alpine:3.14
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 ENV BUILDDEPS="autoconf automake bison build-base flex gcc git libtool libpcap-dev libpcap linux-headers musl-dev python3-dev yaml-dev"
+ENV PYTHONPATH=/tmp/network_tools_lib
 WORKDIR /tmp
 
 # TODO: libwdcap currently requires openssl 1.0.2
@@ -13,8 +14,8 @@ RUN apk add --update $BUILDDEPS \
     && rm -rf /var/cache/apk/* \
     && mkdir /src \
     && cd /src \
-    && git clone https://github.com/wanduow/wandio.git \
-    && git clone https://github.com/LibtraceTeam/libtrace.git \
+    && git clone https://github.com/wanduow/wandio.git -b 4.2.3-1 \
+    && git clone https://github.com/LibtraceTeam/libtrace.git -b 4.0.16-1 \
     && git clone https://github.com/openssl/openssl -b OpenSSL_1_0_2s \
     && git clone https://github.com/wanduow/libwdcap.git \
     && cd /src/wandio \
@@ -44,7 +45,8 @@ RUN apk add --update $BUILDDEPS \
     yaml
 
 VOLUME /tmp
-COPY . /tmp
+COPY network_tap/ncapture/ /tmp
+COPY network_tools_lib /tmp/network_tools_lib
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 

@@ -20,6 +20,9 @@ import subprocess
 import tempfile
 
 import pika
+import network_tools_lib
+
+VERSION = network_tools_lib.get_version()
 
 
 def parse_layer_ports(json_fields):
@@ -112,13 +115,6 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
     print(" [X] %s UTC %r %r" % (str(datetime.datetime.utcnow()),
                                  str(msg['id']), str(msg['file_path'])))
 
-def get_version():
-    version = ''
-    with open('VERSION', 'r') as f:
-        for line in f:
-            version = line.strip()
-    return version
-
 def get_path(paths):
     path = None
     try:
@@ -194,7 +190,7 @@ if __name__ == '__main__':  # pragma: no cover
         try:
             channel = connect_rabbit()
             body = {'id': uid, 'type': 'metadata', 'file_path': result_path, 'data': '',
-                    'results': {'tool': 'pcap-splitter', 'version': get_version()}}
+                    'results': {'tool': 'pcap-splitter', 'version': VERSION}}
             send_rabbit_msg(body, channel)
         except Exception as e:
             print(str(e))

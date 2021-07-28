@@ -2,9 +2,12 @@ FROM debian:stretch-slim
 
 LABEL maintainer = "Charlie Lewis <clewis@iqt.org>"
 
-ENV DEBIAN_FRONTEND = "noninteractive"
+ENV DEBIAN_FRONTEND noninteractive
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONPATH=/app/network_tools_lib
 
-COPY main.cpp main.cpp
+WORKDIR /app
+COPY pcap_to_node_pcap/main.cpp /app/main.cpp
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     python3 \
@@ -35,10 +38,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         /var/cache/apt/*.bin \
     && rm -rf /root/.[acpw]*
 
-COPY VERSION VERSION
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
-COPY pcap_to_node_pcap.py pcap_to_node_pcap.py
+COPY pcap_to_node_pcap/requirements.txt /app/requirements.txt
+COPY pcap_to_node_pcap/pcap_to_node_pcap.py /app/pcap_to_node_pcap.py
+COPY network_tools_lib /app/network_tools_lib
+RUN pip3 install -r /app/requirements.txt
 
-ENTRYPOINT ["python3", "pcap_to_node_pcap.py"]
+RUN python3 /app/pcap_to_node_pcap.py
+
+ENTRYPOINT ["python3", "/app/pcap_to_node_pcap.py"]
 CMD [""]
