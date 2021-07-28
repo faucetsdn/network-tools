@@ -78,7 +78,9 @@ jobs:
       run: |
         for N in ${{ steps.get_images.outputs.NAMES }}
         do
-          docker build -f ${N}/Dockerfile .
+          TAGGED_IMAGE="${{ secrets.DOCKER_NAMESPACE }}/$(basename ${N}):${{ steps.publish_tag.outputs.TAG }}"
+          docker build \
+            -t ${TAGGED_IMAGE} -f ${N}/Dockerfile .
         done
       if: steps.docker.outputs.PUSH_TO_DOCKER == 'false'
     - name: Set up qemu
