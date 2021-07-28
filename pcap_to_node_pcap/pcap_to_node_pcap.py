@@ -125,8 +125,8 @@ def get_path(paths):
 
 def run_split(in_path, clients_dir, servers_dir):
     for tool_cmd in (
-            " ".join(("./PcapSplitter -f", in_path, "-o", clients_dir, "-m client-ip")),
-            " ".join(("./PcapSplitter -f", in_path, "-o", servers_dir, "-m server-ip"))):
+            " ".join(("/PcapSplitter -f", in_path, "-o", clients_dir, "-m client-ip")),
+            " ".join(("/PcapSplitter -f", in_path, "-o", servers_dir, "-m server-ip"))):
         try:
             subprocess.check_call(shlex.split(tool_cmd)) # nosec
         except Exception as err:
