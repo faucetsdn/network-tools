@@ -59,11 +59,11 @@ def test_parse_data():
 
 def test_return_packet():
     lines = []
-    lines.append("2015-05-20 12:41:45.812393 IP 0.0.0.0 > 0.0.0.0: ESP(spi=0xb1ced15c,seq=0x30), length 0\n")
-    lines.append("\t0x0080:  e04b 2935 564f 91db 5344 5460 9189 33d0\n")
-    lines.append("2015-05-20 12:41:45.812393 IP 0.0.0.0 > 0.0.0.0: ESP(spi=0xb1ced15c,seq=0x30), length 0\n")
-    lines.append("\t0x0080:  e04b 2935 564f 91db 5344 5460 9189 33d0\n")
-    packets = return_packet(lines)
+    lines.append("2015-05-20 12:41:45.812393 IP 0.0.0.0 > 0.0.0.0: ESP(spi=0xb1ced15c,seq=0x30), length 0")
+    lines.append("\t0x0080:  e04b 2935 564f 91db 5344 5460 9189 33d0")
+    lines.append("2015-05-20 12:41:45.812393 IP 0.0.0.0 > 0.0.0.0: ESP(spi=0xb1ced15c,seq=0x30), length 0")
+    lines.append("\t0x0080:  e04b 2935 564f 91db 5344 5460 9189 33d0")
+    packets = return_packet([line.encode('utf-8') for line in lines])
     for packet in packets:
         assert isinstance(packet, dict)
         assert packet['data'] == "e04b2935564f91db53445460918933d0"
