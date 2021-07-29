@@ -93,7 +93,7 @@ def return_packet(line_source):
     ret_header = {}
     ret_dict = {}
     for line in line_source:
-        line_strip = line.strip()
+        line_strip = line.decode('utf-8').strip()
         is_header = not line_strip.startswith('0x')
         if is_header:
             #parse header
@@ -108,14 +108,14 @@ def return_packet(line_source):
                 yield ret_dict
         else:
             #concatenate the data
-            data = parse_data(line_strip, ret_header['length'])
+            data = parse_data(line_strip, ret_header.get('length', 0))
             ret_data = ret_data + data
 
 def run_tool(path):
     """Tool entry point"""
-    proc = subprocess.Popen('tcpdump -nn -tttt -xx -r '+path, shell=True, stdout=subprocess.PIPE)
-    for packet in return_packet(proc.stdout):
-        print(str(packet))
+    with subprocess.Popen('tcpdump -nn -tttt -xx -r '+path, shell=True, stdout=subprocess.PIPE) as proc:
+        for packet in return_packet(proc.stdout):
+            print(str(packet))
 
 if __name__ == '__main__':
     path = get_path()
