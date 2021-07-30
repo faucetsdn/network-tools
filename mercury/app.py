@@ -2,7 +2,6 @@ import datetime
 import json
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 
@@ -27,16 +26,12 @@ def send_rabbit_msg(msg, channel, exchange='', routing_key='task_queue'):
     print(" [X] %s UTC %r %r" % (str(datetime.datetime.utcnow()),
                                  str(msg['id']), str(msg['file_path'])))
 
-def run_proc(args, output=subprocess.DEVNULL):
-    proc = subprocess.Popen(args, stdout=output)
-    return proc.communicate()
-
 def run_mercury(path):
     with tempfile.TemporaryDirectory() as tempdir:
         mercury = shutil.which('pmercury')
         mercury_output = os.path.join(tempdir, 'mercury_output.txt')
         args = [mercury, '-awxg', '-r', path, '-f', mercury_output]
-        run_proc(args)
+        network_tools_lib.run_proc(args)
         with open(mercury_output, 'r') as f:
             return f.read()
 

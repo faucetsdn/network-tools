@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 
@@ -11,12 +10,6 @@ import pyshark
 import network_tools_lib
 
 VERSION = network_tools_lib.get_version()
-
-
-def run_proc(args, output=subprocess.DEVNULL):
-    with subprocess.Popen(args, stdout=output) as proc:
-        proc_output = proc.communicate()
-    return proc_output
 
 
 def run_p0f(path):
@@ -27,7 +20,7 @@ def run_p0f(path):
             p0f = '/usr/sbin/p0f'
         p0f_output = os.path.join(tempdir, 'p0f_output.txt')
         args = [p0f, '-r', path, '-o', p0f_output]
-        run_proc(args)
+        network_tools_lib.run_proc(args)
         with open(p0f_output, 'r') as f:
             return f.read()
 
