@@ -5,6 +5,7 @@ Created on 20 December 2018
 @author: Charlie Lewis
 """
 import os
+import shutil
 import sys
 
 from .app import VERSION
@@ -14,9 +15,15 @@ from .app import main
 from .app import run_tshark
 from .app import run_p0f
 from .app import build_result_json
+import network_tools_lib
 
 
 TEST_LO_CAP = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'test_lo.cap')
+
+
+def test_runproc():
+    # returned filehandles both none as process has exited.
+    assert network_tools_lib.run_proc([shutil.which('ls')]) == (None, None)
 
 
 def test_ispcap():

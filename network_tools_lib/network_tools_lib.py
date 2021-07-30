@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 
 def mod_path(filename, file_for_dir=None):
@@ -11,3 +12,9 @@ def get_version():
     ver_path = os.path.join(mod_path('VERSION', __file__))
     with open(ver_path, 'r') as f:
         return f.read().strip()
+
+
+def run_proc(args, output=subprocess.DEVNULL):
+    with subprocess.Popen(args, stdout=output) as proc:
+        proc_output = proc.communicate()
+    return proc_output

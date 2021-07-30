@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 
@@ -13,10 +12,6 @@ import network_tools_lib
 VERSION = network_tools_lib.get_version()
 
 
-def run_proc(args, output=subprocess.DEVNULL):
-    proc = subprocess.Popen(args, stdout=output)
-    return proc.communicate()
-
 def run_p0f(path):
     with tempfile.TemporaryDirectory() as tempdir:
         p0f = shutil.which('p0f')
@@ -25,7 +20,7 @@ def run_p0f(path):
             p0f = '/usr/sbin/p0f'
         p0f_output = os.path.join(tempdir, 'p0f_output.txt')
         args = [p0f, '-r', path, '-o', p0f_output]
-        run_proc(args)
+        network_tools_lib.run_proc(args)
         with open(p0f_output, 'r') as f:
             return f.read()
 
