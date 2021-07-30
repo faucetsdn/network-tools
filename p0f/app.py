@@ -14,8 +14,10 @@ VERSION = network_tools_lib.get_version()
 
 
 def run_proc(args, output=subprocess.DEVNULL):
-    proc = subprocess.Popen(args, stdout=output)
-    return proc.communicate()
+    with subprocess.Popen(args, stdout=output) as proc:
+        proc_output = proc.communicate()
+    return proc_output
+
 
 def run_p0f(path):
     with tempfile.TemporaryDirectory() as tempdir:
