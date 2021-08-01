@@ -8,7 +8,7 @@ ENV PYTHONPATH=/app/network_tools_lib
 # Install packages
 # hadolint ignore=DL3008
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc libxml2-dev libxslt-dev python3-dev tshark p0f zlib1g-dev && \
+    apt-get install -y --no-install-recommends python3-dev tshark p0f && \
     rm -rf /var/cache/* && \
     rm -rf /root/.cache/*
 

@@ -1,23 +1,24 @@
 #!/bin/bash
 
 # smoke test for ncapture worker
-# requires tcpdump and tshark to be installed.
 
 URI=lo
 IP=127.0.0.1
 SIZE=1000
 MAXCAPLEN=50
 
-TMPDIR=$(mktemp -d)
+sudo apt-get update && sudo apt-get install tcpdump tshark
+docker build -f network_tap/ncapture/Dockerfile . -t iqtlabs/ncapture || exit 1
 
-docker build -f Dockerfile . -t iqtlabs/ncapture
+TMPDIR=$(mktemp -d)
 echo starting ncapture
 docker run --privileged --net=host --cap-add=NET_ADMIN -v $TMPDIR:/files -t iqtlabs/ncapture /tmp/run.sh $URI 15 test 1 "host $IP and icmp" "" -d 12 -s 4 -a none -c none -o /files/ || exit 1 &
 echo waiting for pcap
 PINGS=0
 while [ "$(find $TMPDIR -prune -empty)" ] ; do
   ((++PINGS))
-  ping -q -n -i 0.1 -s $SIZE -c 10 $IP > /dev/null
+  # need sudo for low interval
+  sudo ping -q -n -i 0.1 -s $SIZE -c 10 $IP > /dev/null
   echo -n .$PINGS
   if [ "$PINGS" -gt "60" ] ; then
 	  echo timed out waiting for pcap
