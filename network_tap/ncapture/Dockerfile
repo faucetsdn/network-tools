@@ -8,12 +8,12 @@ RUN git clone https://github.com/wanduow/wandio.git -b 4.2.3-1 \
     && git clone https://github.com/openssl/openssl -b OpenSSL_1_0_2s \
     && git clone https://github.com/wanduow/libwdcap.git
 
-FROM alpine:3.14 as builder
+FROM alpine:3.14 
 COPY --from=checkout /src /src
 WORKDIR /src
 
 # TODO: libwdcap currently requires openssl 1.0.2
-RUN apk add --update autoconf automake coreutils bison build-base flex gcc libtool libpcap-dev libpcap linux-headers musl-dev yaml-dev
+RUN apk add --update autoconf automake bison build-base flex gcc libtool libpcap-dev libpcap linux-headers musl-dev yaml-dev
 
 WORKDIR /src/openssl
 RUN ./config --prefix=/usr/local --openssldir=/usr/local/openssl && MAKEFLAGS=--quiet make -j "$(nproc)" && make install_sw
@@ -26,18 +26,15 @@ RUN ./bootstrap.sh && ./configure --disable-shared && make && make install
 WORKDIR /src/libwdcap/examples 
 RUN g++ -fpermissive -o tracecapd tracecapd.c -L/usr/local/lib -Wl,-Bstatic -ltrace -lwdcap -Wl,-Bdynamic -lpcap -lssl -lcrypto -lwandio -lyaml && cp tracecapd /usr/local/bin
 
-FROM alpine:3.14
-
 WORKDIR /tmp
 VOLUME /tmp
 
 COPY network_tap/ncapture/ /tmp
-RUN apk add --update bash coreutils libstdc++ libgcc libpcap yaml python3 py3-pip
-COPY --from=builder /etc/ssl /etc/ssl
-RUN pip3 install --no-cache-dir -r requirements.txt
-COPY --from=builder /usr/local /usr/local
-RUN ldd /usr/local/bin/tracecapd
 COPY network_tools_lib /tmp/network_tools_lib
+
+RUN apk add --update bash coreutils python3 py3-pip
+RUN pip3 install --no-cache-dir -r requirements.txt
+RUN ldd /usr/local/bin/tracecapd
 
 ENV PYTHONPATH=/tmp/network_tools_lib
 CMD ["/tmp/run.sh"]
