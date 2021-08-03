@@ -5,8 +5,17 @@ Created on 20 December 2018
 @author: Charlie Lewis
 """
 import argparse
+import os
+import shutil
+import tempfile
 
-from .pcap_to_node_pcap import get_path, ipaddress_fields, run_tool, parse_pcap_json_to_layers, pcap_name_with_layers, parse_args
+from .pcap_to_node_pcap import get_path, ipaddress_fields, run_tool, parse_pcap_json_to_layers, pcap_name_with_layers, parse_args, proto_annotate_pcaps
+
+
+def test_proto_annotate_pcaps():
+    with tempfile.TemporaryDirectory() as tmpdir:
+       shutil.copy(os.path.join(os.path.dirname(__file__), 'test_lo.cap'), tmpdir)
+       proto_annotate_pcaps(tmpdir)
 
 
 def test_parse_pcap_json():

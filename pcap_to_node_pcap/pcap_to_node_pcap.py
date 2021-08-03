@@ -23,6 +23,7 @@ import pika
 import network_tools_lib
 
 VERSION = network_tools_lib.get_version()
+TSHARK_FIELDS = ('ip', 'ipv6', 'arp', 'tcp', 'udp')
 
 
 def parse_layer_ports(json_fields):
@@ -66,7 +67,7 @@ def parse_pcap_json_to_layers(pcap_json):
             continue
         ipas = set()
         ports = set()
-        for field in ('ip', 'ipv6', 'arp', 'tcp', 'udp'):
+        for field in TSHARK_FIELDS:
             if field in layers_json:
                 json_fields = layers_json[field]
                 ipas = ipas.union(ipaddress_fields(json_fields))
@@ -90,13 +91,16 @@ def proto_annotate_pcaps(pcap_dir):
         return
     for pcap_filename in pap_filenames:
         try:
+            # disable DNS, limit to 10 packets, limit fields.
             response = subprocess.check_output(shlex.split(' '.join( # nosec
-                ['/tshark', '-T', 'json', '-c', str(10), '-r', pcap_filename])))
+                [shutil.which('tshark'), '-T', 'json', '-c', str(10), '-n',
+                    '-J', '"%s"' % ' '.join(TSHARK_FIELDS), '-r', pcap_filename])))
             pcap_json = json.loads(response.decode('utf-8'))
         except (json.decoder.JSONDecodeError, subprocess.CalledProcessError) as e:
             print(pcap_filename, str(e))
             continue
         pcap_layers = parse_pcap_json_to_layers(pcap_json)
+        print(pcap_filename, pcap_layers)
         layers_pcap_filename = pcap_name_with_layers(pcap_filename, pcap_layers, pcap_suffix)
         os.rename(pcap_filename, layers_pcap_filename)
 
