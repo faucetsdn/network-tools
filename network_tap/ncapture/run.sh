@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 URI="$1"
 INTERVAL="$2"
@@ -76,6 +75,11 @@ run_tracecapd() {
     echo -e "format: pcapfile\nnamingscheme: ${name}\ncompressmethod: none\nrotationperiod: day\n" > $dwconf
     echo -e "anon: $ANON\nchecksum: $CSUM\npayload: $PAYS\ndnspayload: $DPAYS\n" > $ppconf
     timeout --preserve-status -k2 ${interval}s tracecapd -t 1 -c $dwconf -p $ppconf -s $uri -f "$filter"
+    status=$?
+    if [ $status != 0 ]; then
+        python3 send_message.py -1;
+        exit 1
+    fi
 }
 
 run_capture() {
