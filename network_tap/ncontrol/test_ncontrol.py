@@ -4,12 +4,12 @@ import falcon
 import pytest
 from falcon import testing
 
-from .ncontrol import api
+from ncontrol import make_api
 
 
 @pytest.fixture
 def client():
-    return testing.TestClient(api)
+    return testing.TestClient(make_api())
 
 
 def test_create_r(client):

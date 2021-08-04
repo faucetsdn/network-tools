@@ -50,13 +50,8 @@ def parse_args(parser):
 if __name__ == '__main__':  # pragma: no cover
     parsed_args = parse_args(argparse.ArgumentParser())
     path = get_path(parsed_args.paths)
-    uid = ''
-    if 'id' in os.environ:
-        uid = os.environ['id']
-    if 'external_host' in os.environ:
-        external_host = os.environ['external_host']
-    else:
-        external_host = 'messenger'
+    uid = os.environ.get('id', '')
+    external_host = os.environ.get('external_host', 'messenger')
     if os.environ.get('rabbit', False) == 'true':
         try:
             channel = connect_rabbit(host=external_host)
