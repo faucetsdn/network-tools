@@ -10,7 +10,6 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends bash git libpcap-dev make gcc g++ \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN GIT_SSL_NO_VERIFY=true git clone https://github.com/seladb/PcapPlusPlus.git /PcapPlusPlus -b v21.05
-COPY pcap_to_node_pcap/main.cpp /PcapPlusPlus/Examples/PcapSplitter/main.cpp
 WORKDIR /PcapPlusPlus
 RUN /bin/bash ./configure-linux.sh --default
 WORKDIR /PcapPlusPlus/Examples/PcapSplitter
