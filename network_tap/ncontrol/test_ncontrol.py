@@ -4,7 +4,7 @@ import falcon
 import pytest
 from falcon import testing
 
-from .ncontrol import api
+from ncontrol import api
 
 
 @pytest.fixture
