@@ -15,4 +15,4 @@ for route in r:
 
 
 if __name__ == "__main__":
-    bjoern.run(api, "0.0.0.0", 8080)
+    bjoern.run(api, "0.0.0.0", 8080)  # nosec
