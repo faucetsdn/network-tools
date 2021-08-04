@@ -1,12 +1,12 @@
 def routes():
-    from .paths import CreateR, DeleteR, InfoR, ListR, StartR, StopR
-    p = paths()
-    create_r = CreateR()
-    delete_r = DeleteR()
-    info_r = InfoR()
-    list_r = ListR()
-    start_r = StartR()
-    stop_r = StopR()
+    import paths
+    p = endpoints()
+    create_r = paths.CreateR()
+    delete_r = paths.DeleteR()
+    info_r = paths.InfoR()
+    list_r = paths.ListR()
+    start_r = paths.StartR()
+    stop_r = paths.StopR()
     funcs = [create_r,
              delete_r,
              info_r,
@@ -16,7 +16,7 @@ def routes():
     return dict(list(zip(p, funcs)))
 
 
-def paths():
+def endpoints():
     return ['/create',
             '/delete',
             '/info',

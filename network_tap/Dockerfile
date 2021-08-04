@@ -2,6 +2,7 @@ FROM alpine:3.14
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 ENV PYTHONPATH=/network-tap/network_tools_lib
+ENV PYTHONUNBUFFERED 1
 
 COPY network_tap/ncontrol/requirements.txt requirements.txt
 COPY network_tap/healthcheck /healthcheck
@@ -11,6 +12,7 @@ RUN apk add --update \
     gcc \
     g++ \
     git \
+    libev-dev \
     linux-headers \
     musl-dev \
     python3 \
@@ -38,4 +40,4 @@ WORKDIR /network-tap
 
 EXPOSE 8080
 
-CMD (flask run > /dev/null 2>&1) & (/network-tap/startup.sh)
+CMD (flask run > /dev/null 2>&1) & (python3 ncontrol/ncontrol.py)
