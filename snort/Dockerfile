@@ -11,9 +11,9 @@ RUN mkdir -p /var/log/snort && \
 RUN apt-get update && \
     apt-get install -y \
         autoconf \
+        curl \
         python3 \
         python3-pip \
-        wget \
         build-essential \
         bison \
         flex \
@@ -27,12 +27,13 @@ RUN apt-get update && \
         tcpdump \
         unzip && \
         apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+COPY snort/downloadhelper.sh /opt/downloadhelper.sh
 WORKDIR /opt
-RUN wget -qO- https://www.snort.org/downloads/snort/daq-${DAQ_VERSION}.tar.gz | tar -zxv -f - && mv daq-${DAQ_VERSION} daq
+RUN /opt/downloadhelper.sh https://www.snort.org/downloads/snort/daq-${DAQ_VERSION}.tar.gz daq.tgz && tar zxvf daq.tgz && mv daq-${DAQ_VERSION} daq && rm daq.tgz
 WORKDIR /opt/daq
 RUN autoreconf -f -i && ./configure && make && make install
 WORKDIR /opt
-RUN wget -qO- https://www.snort.org/downloads/snort/snort-${SNORT_VERSION}.tar.gz | tar -zxv -f - && mv snort-${SNORT_VERSION} snort
+RUN /opt/downloadhelper.sh https://www.snort.org/downloads/snort/snort-${SNORT_VERSION}.tar.gz snort.tgz && tar zxvf snort.tgz && mv snort-${SNORT_VERSION} snort && rm snort.tgz
 WORKDIR /opt/snort
 RUN ./configure --disable-open-appid && make && make install
 
