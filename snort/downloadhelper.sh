@@ -15,7 +15,8 @@ i=0
 while [ $i -lt $retries ]; do
 	i=$((i+1))
 	rm -f $outfile
-	curl -Lv $url --output $tarfile
+	# TODO: snort binary serving does not work with TLS 1.3
+	curl -Lv $url --tlsv1.2 --tls-max 1.2 --output $tarfile --trace -
 	tar ztvf $tarfile
 	tarstatus=$?
 	if [[ -f "$tarfile" && $tarstatus -eq 0 ]] ; then
