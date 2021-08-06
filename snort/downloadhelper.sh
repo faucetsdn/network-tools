@@ -15,7 +15,7 @@ i=0
 while [ $i -lt $retries ]; do
 	i=$((i+1))
 	rm -f $outfile
-	curl -Lv $url --output $tarfile
+	curl -Lv $url --output $tarfile --trace -
 	tar ztvf $tarfile
 	tarstatus=$?
 	if [[ -f "$tarfile" && $tarstatus -eq 0 ]] ; then
