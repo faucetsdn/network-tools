@@ -9,19 +9,31 @@ on:
 
 jobs:
   buildx:
-
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        include:
+          # tools are build in order, for dependencies.
+          - name: "rbqwrapped tools (p0f only)"
+            tools: "rbqwrapper p0f"
+          - name: pcap_to_node_pcap
+            tools: "pcap_to_node_pcap"
+          - name: tcprewrite_dot1q
+            tools: "tcprewrite_dot1q"
+          - name: ncapture
+            tools: "network_tap/ncapture"
+          - name: network_tap
+            tools: "network_tap"
+          - name: mercury
+            tools: "mercury"
+          - name: pcap_stats
+            tools: "pcap_stats"
+          - name: snort
+            tools: "snort"
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Define list of images to build
-      id: get_images
-      run: |
-        echo ::set-output name=NAMES::${NAMES}
-      env:
-        NAMES: rbqwrapper pcap_to_node_pcap tcprewrite_dot1q network_tap/ncapture network_tap p0f mercury pcap_stats snort
     - name: Get version number
       id: get_version
       run: |
@@ -76,11 +88,9 @@ jobs:
         VERSION: ${{ steps.get_version.outputs.VERSION }}
     - name: Test building only
       run: |
-        for N in ${{ steps.get_images.outputs.NAMES }}
-        do
-          TAGGED_IMAGE="${{ secrets.DOCKER_NAMESPACE }}/$(basename ${N}):${{ steps.publish_tag.outputs.TAG }}"
-          docker build \
-            -t ${TAGGED_IMAGE} -f ${N}/Dockerfile .
+        for tool in ${{ matrix.tools }} ; do
+          TAGGED_IMAGE="${{ secrets.DOCKER_NAMESPACE }}/$(basename ${tool}):${{ steps.publish_tag.outputs.TAG }}"
+          docker build -t ${TAGGED_IMAGE} -f "${tool}/Dockerfile" .
         done
       if: steps.docker.outputs.PUSH_TO_DOCKER == 'false'
     - name: Set up qemu
@@ -103,22 +113,20 @@ jobs:
       env:
         DOCKER_CLI_EXPERIMENTAL: enabled
       run: |
-        for N in ${{ steps.get_images.outputs.NAMES }}
-        do
-          TAGGED_IMAGE="${{ secrets.DOCKER_NAMESPACE }}/$(basename ${N}):${{ steps.publish_tag.outputs.TAG }}"
+        for tool in ${{ matrix.tools }} ; do
+          TAGGED_IMAGE="${{ secrets.DOCKER_NAMESPACE }}/$(basename ${tool}):${{ steps.publish_tag.outputs.TAG }}"
           docker buildx build \
             --platform linux/amd64,linux/arm/v7,linux/arm64 \
             --push \
-            -t ${TAGGED_IMAGE} -f ${N}/Dockerfile .
+            -t ${TAGGED_IMAGE} -f "${tool}/Dockerfile" .
         done
       if: success() && (steps.docker.outputs.PUSH_TO_DOCKER == 'true')
     - name: List available tags for images
       env:
         DOCKER_CLI_EXPERIMENTAL: enabled
       run: |
-        for N in ${{ steps.get_images.outputs.NAMES }}
-        do
-          image="${{ secrets.DOCKER_NAMESPACE }}/$(basename ${N})"
+        for tool in ${{ matrix.tools }} ; do
+          image="${{ secrets.DOCKER_NAMESPACE }}/$(basename ${tool})"
           echo "${image}:" $(
             wget -q https://registry.hub.docker.com/v1/repositories/${image}/tags -O - |
               tr -d '[]" ' |
