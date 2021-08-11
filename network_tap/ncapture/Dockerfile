@@ -5,7 +5,7 @@ RUN apk add --update git
 WORKDIR /src
 RUN git clone https://github.com/wanduow/wandio.git -b 4.2.3-1 \
     && git clone https://github.com/LibtraceTeam/libtrace.git -b 4.0.16-1 \
-    && git clone https://github.com/wanduow/libwdcap.git -b 1.0.1
+    && git clone https://github.com/wanduow/libwdcap.git -b 1.0.1-1
 
 FROM alpine:3.14 as builder
 COPY --from=checkout /src /src
