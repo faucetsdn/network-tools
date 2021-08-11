@@ -28,12 +28,14 @@ RUN apt-get update && \
         unzip && \
         apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 COPY snort/downloadhelper.sh /opt/downloadhelper.sh
+# hadolint ignore=DL3010
+COPY snort/*.tar.gz /opt/
 WORKDIR /opt
-RUN /opt/downloadhelper.sh https://www.snort.org/downloads/snort/daq-${DAQ_VERSION}.tar.gz daq.tgz && tar zxvf daq.tgz && mv daq-${DAQ_VERSION} daq && rm daq.tgz
+RUN /opt/downloadhelper.sh https://www.snort.org/downloads/snort/daq-${DAQ_VERSION}.tar.gz daq-${DAQ_VERSION}.tar.gz && tar zxvf daq-${DAQ_VERSION}.tar.gz && mv daq-${DAQ_VERSION} daq && rm daq-${DAQ_VERSION}.tar.gz
 WORKDIR /opt/daq
 RUN autoreconf -f -i && ./configure && make && make install
 WORKDIR /opt
-RUN /opt/downloadhelper.sh https://www.snort.org/downloads/snort/snort-${SNORT_VERSION}.tar.gz snort.tgz && tar zxvf snort.tgz && mv snort-${SNORT_VERSION} snort && rm snort.tgz
+RUN /opt/downloadhelper.sh https://www.snort.org/downloads/snort/snort-${SNORT_VERSION}.tar.gz snort-${SNORT_VERSION}.tar.gz && tar zxvf snort-${SNORT_VERSION}.tar.gz && mv snort-${SNORT_VERSION} snort && rm snort-${SNORT_VERSION}.tar.gz
 WORKDIR /opt/snort
 RUN ./configure --disable-open-appid && make && make install
 
