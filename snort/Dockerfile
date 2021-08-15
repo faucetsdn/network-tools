@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 ENV DAQ_VERSION 2.0.7

@@ -1,4 +1,4 @@
-FROM debian:buster-slim AS pcapsplitter
+FROM debian:bullseye-slim AS pcapsplitter
 
 LABEL maintainer = "Charlie Lewis <clewis@iqt.org>"
 
@@ -15,7 +15,7 @@ RUN /bin/bash ./configure-linux.sh --default
 WORKDIR /PcapPlusPlus/Examples/PcapSplitter
 RUN make
 
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 ENV PYTHONPATH=/app/network_tools_lib
 
