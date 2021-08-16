@@ -22,7 +22,7 @@ RUN apt-get update && \
         libdumbnet-dev \
         libtool \
         zlib1g-dev \
-        iptables-dev \
+        libxtables-dev \
         libnetfilter-queue1 \
         tcpdump \
         unzip && \
