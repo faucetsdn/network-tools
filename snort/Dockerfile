@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 ENV DAQ_VERSION 2.0.7
@@ -22,7 +22,7 @@ RUN apt-get update && \
         libdumbnet-dev \
         libtool \
         zlib1g-dev \
-        iptables-dev \
+        libxtables-dev \
         libnetfilter-queue1 \
         tcpdump \
         unzip && \
