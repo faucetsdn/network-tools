@@ -36,20 +36,21 @@ def test_version():
 
 
 def test_result_json():
-    assert build_result_json([TEST_LO_CAP]) == [{'data': {  # nosec
-        'file_path': TEST_LO_CAP,
-        'ipv4_addresses': {'127.0.0.1': {'full_os': 'Linux 2.2.x-3.x', 'mac': '00:00:00:00:00:00', 'raw_mtu': '65535', 'short_os': 'Linux'}},
-        'ipv6_addresses': {'::1': {'mac': '00:00:00:00:00:00', 'raw_mtu': '65536'}}},
+    assert build_result_json([TEST_LO_CAP]) == [{
+        'data': {  # nosec
+            'p0f_output_size': 1702,
+            'pcap_packets': 18,
+            'file_path': TEST_LO_CAP,
+            'ipv4_addresses': {'127.0.0.1': {'full_os': 'Linux 2.2.x-3.x', 'mac': '00:00:00:00:00:00', 'raw_mtu': '65535', 'short_os': 'Linux'}},
+            'ipv6_addresses': {'::1': {'mac': '00:00:00:00:00:00', 'raw_mtu': '65536'}}},
         'file_path': TEST_LO_CAP,
         'id': '',
-        'results': {'tool': 'p0f', 'version': VERSION}, 'tool': 'p0f',
-        'type': 'metadata', 'version': VERSION},
-    {
+        'results': {'tool': 'p0f', 'version': VERSION},
+        'tool': 'p0f', 'type': 'metadata', 'version': VERSION}, {
         'data': '',
         'file_path': TEST_LO_CAP,
         'id': '',
-        'results': {'tool': 'p0f',
-        'version': VERSION},
+        'results': {'tool': 'p0f', 'version': VERSION},
         'tool': 'p0f',
         'type': 'metadata'}]
 
