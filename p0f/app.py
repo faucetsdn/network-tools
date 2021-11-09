@@ -42,19 +42,21 @@ def parse_eth(packet):
 
 def run_tshark(path):
     addresses = set()
+    pcap_packets = 0
     with pyshark.FileCapture(
             path, include_raw=False, keep_packets=False, debug=True,
             custom_parameters=[
                 '-o', 'tcp.desegment_tcp_streams:false', '-n'],  # disable DNS
             tshark_path=os.path.join(os.path.dirname(__file__), 'tsharkwrapper.sh')) as cap:
         for packet in cap:
+            pcap_packets += 1
             src_eth_address, dst_eth_address = parse_eth(packet)
             src_address, dst_address = parse_ip(packet)
             if src_eth_address and src_address:
                 addresses.add((src_address, src_eth_address))
             if dst_eth_address and dst_address:
                 addresses.add((dst_address, dst_eth_address))
-    return addresses
+    return (pcap_packets, addresses)
 
 def parse_output(p0f_output, addresses):
     results = {}
@@ -100,7 +102,7 @@ def build_result_json(pcap_paths):
         ipv4_addresses = {}
         ipv6_addresses = {}
         p0f_output = run_p0f(path)
-        addresses = run_tshark(path)
+        pcap_packets, addresses = run_tshark(path)
         results = parse_output(p0f_output, addresses)
         for ip, metadata in results.items():
             if metadata:
@@ -116,11 +118,24 @@ def build_result_json(pcap_paths):
             'id': os.environ.get('id', ''),
             'type': 'metadata',
             'file_path': path,
-            'results': {'tool': 'p0f', 'version': VERSION},
-            'data': {'file_path': path, 'ipv4_addresses': ipv4_addresses, 'ipv6_addresses': ipv6_addresses},
+            'results': {
+                'tool': 'p0f',
+                'version': VERSION},
+            'data': {
+                'file_path': path,
+                'p0f_output_size': len(p0f_output),
+                'pcap_packets': pcap_packets,
+                'ipv4_addresses': ipv4_addresses,
+                'ipv6_addresses': ipv6_addresses},
         })
     # final record without data to indicate it's done
-    all_results.append({'tool': 'p0f', 'id': os.environ.get('id', ''), 'type': 'metadata', 'file_path': pcap_paths[0], 'data': '', 'results': {'tool': 'p0f', 'version': VERSION}})
+    all_results.append({
+        'tool': 'p0f',
+        'id': os.environ.get('id', ''),
+        'type': 'metadata',
+        'file_path': pcap_paths[0],
+        'data': '',
+        'results': {'tool': 'p0f', 'version': VERSION}})
 
     return all_results
 
