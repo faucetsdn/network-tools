@@ -1,2 +1,2 @@
-pyshark==0.4.6
+pyshark==0.5.2
 pytest==7.1.2
