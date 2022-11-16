@@ -1,4 +1,4 @@
-FROM alpine:3.16 as checkout
+FROM alpine:3.17 as checkout
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 RUN apk add --update git
@@ -7,7 +7,7 @@ RUN git clone https://github.com/wanduow/wandio.git -b 4.2.3-1 \
     && git clone https://github.com/LibtraceTeam/libtrace.git -b 4.0.16-1 \
     && git clone https://github.com/wanduow/libwdcap.git -b 1.0.1-1
 
-FROM alpine:3.16 as builder
+FROM alpine:3.17 as builder
 COPY --from=checkout /src /src
 WORKDIR /src
 
@@ -26,7 +26,7 @@ RUN ./bootstrap.sh && ./configure --disable-shared && make && make install
 WORKDIR /src/libwdcap/examples 
 RUN g++ -fpermissive -o tracecapd tracecapd.c -L/usr/local/lib -Wl,-Bstatic -ltrace -lwdcap -lwandio -Wl,-Bdynamic -lpcap -lssl -lcrypto -lyaml && cp tracecapd /usr/local/bin
 
-FROM alpine:3.16
+FROM alpine:3.17
 
 WORKDIR /tmp
 VOLUME /tmp
