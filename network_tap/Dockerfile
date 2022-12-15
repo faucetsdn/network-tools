@@ -1,4 +1,4 @@
-FROM alpine:3.16
+FROM alpine:3.17
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 ENV PYTHONPATH=/network-tap/network_tools_lib
