@@ -108,7 +108,7 @@ def return_packet(line_source):
                 yield ret_dict
         else:
             #concatenate the data
-            data = parse_data(line_strip, ret_header.get('length', 0))
+            data = parse_data(line_strip, int(ret_header.get('length', 0)))
             ret_data = ret_data + data
 
 def run_tool(path):
