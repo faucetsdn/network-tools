@@ -22,5 +22,5 @@ jobs:
         make test && \
         coverage report && coverage xml
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3.1.2
+      uses: codecov/codecov-action@v3.1.3
       if: github.repository == 'iqtlabs/network-tools'
