@@ -1,4 +1,4 @@
-FROM alpine:3.17
+FROM alpine:3.18
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 RUN apk add --update \
