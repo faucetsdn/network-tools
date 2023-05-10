@@ -1,5 +1,5 @@
 # TODO: requires python3.8
-FROM alpine:3.17
+FROM alpine:3.18
 LABEL maintainer="Charlie Lewis <clewis@iqt.org>"
 
 ENV DEBIAN_FRONTEND noninteractive
